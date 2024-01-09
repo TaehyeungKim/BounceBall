@@ -1,7 +1,7 @@
 import { GameObject } from "../baseObj.js";
 
 type BallDirection = 'up'|'down'|'left'|'right'
-type Coordinate = {x: number, y: number}
+export type Coordinate = {x: number, y: number}
 
 export class Ball extends GameObject {
     private _gs: number = 0.9;
