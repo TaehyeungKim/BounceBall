@@ -6,7 +6,6 @@ export class Map {
         this._horizontalN = CANVAS_WIDTH / BLOCK_WIDTH;
         this._verticalN = CANVAS_HEIGHT / BLOCK_HEIGHT;
         this.initializeMatrix();
-        console.log(this._matrix);
     }
     get matrix() {
         return this._matrix;
@@ -22,7 +21,6 @@ export class Map {
     pushBlock(x, y, w, h, type) {
         if (x >= CANVAS_WIDTH / BLOCK_WIDTH || y >= CANVAS_HEIGHT / BLOCK_HEIGHT)
             throw new Error('unvaild coordinate, so can\'t generate block');
-        console.log(x >= CANVAS_WIDTH / BLOCK_WIDTH, CANVAS_HEIGHT / BLOCK_HEIGHT);
         const block = new Block(x * BLOCK_WIDTH, y * BLOCK_HEIGHT, w, h, type);
         this._matrix[y][x] = block;
     }

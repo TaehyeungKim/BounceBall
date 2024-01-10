@@ -1,6 +1,6 @@
 import { GameObject } from "../baseObj.js";
 
-type BallDirection = 'up'|'down'|'left'|'right'
+export type BallDirection = 'up'|'down'|'left'|'right'
 export type Coordinate = {x: number, y: number}
 
 export class Ball extends GameObject {
@@ -37,6 +37,7 @@ export class Ball extends GameObject {
                 break;
             case "right":
                 this.x += this._hvs;
+                
                 if(this._hvs < Ball.MAX_HVS) this._hvs += 0.2;
         }
     }
@@ -51,22 +52,24 @@ export class Ball extends GameObject {
             case "up":
                 this._gvs = -this._gvs;
                 if(this._gvs > Ball.MAX_GVS) this._gvs = Ball.MAX_GVS;
-                this.y = point.y + this._r;
+                
                 break;
             case "down":
                 this._gvs = - this._gvs;
+                
                 if(this._gvs < -Ball.MAX_GVS) this._gvs = -Ball.MAX_GVS;
-                this.y = point.y - this._r;
+                
                 break;
             case "left":
                 this._hvs = - this._hvs;
-                this.x = point.x + this._r;
+                
                 break;
             case "right":
                 this._hvs = - this._hvs;
-                this.x = point.x - this.r;
+                
                 break;
         }
+        this.x = point.x; this.y = point.y
     }
 
 }
