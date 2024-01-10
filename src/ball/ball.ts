@@ -26,10 +26,12 @@ export class Ball extends GameObject {
             case "down":                
                 this.y += this._gs * this._gvs;
                 this._gvs += 2;
+                
                 break;
             case "up":
                 this.y += this._gs * this._gvs;
                 this._gvs += 2;
+                
                 break;
             case "left":
                 this.x += this._hvs;

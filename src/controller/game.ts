@@ -10,7 +10,10 @@ export class Game extends Controller {
 
     play(root: HTMLElement) {
         this.attachCanvas(root)
-        for(let i = 0; i < (CANVAS_WIDTH/BLOCK_WIDTH); i++) this.generateBlock(i,14,BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
+        for(let i = 0; i < (CANVAS_WIDTH/BLOCK_WIDTH); i++) {
+            this.generateBlock(i,14,BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
+            this.generateBlock(i,13,BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
+        }
         this.registerRenderInterval();
 
         window.addEventListener('keydown', (e: KeyboardEvent)=>{
