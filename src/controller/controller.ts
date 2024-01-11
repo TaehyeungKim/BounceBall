@@ -34,7 +34,7 @@ export class Controller {
         this._canvas.width = CANVAS_WIDTH;
         this._canvas.height = CANVAS_HEIGHT;
         this._canvas.style.backgroundColor = 'black'
-        this._ball = new ball(10,100,5,5);
+        this._ball = new ball(10,270,5,5);
         this._map = new map()
 
         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
@@ -60,6 +60,7 @@ export class Controller {
         xOf:1|0|-1=0, yOf:1|0|-1=0,
         ):CrashInfo|false {
 
+        console.log(x,y,xOf,yOf)
         
         //recursion end point
         if(h_d === "center" && v_d === "center") {
@@ -74,7 +75,7 @@ export class Controller {
             }
         }
         else if(xOf === -1) {
-            if(x*BLOCK_WIDTH + this._ball.r < this._ball.x) {
+            if((x+1)*BLOCK_WIDTH + this._ball.r < this._ball.x) {
                 console.log(2)
                 return false;
             }
@@ -84,7 +85,7 @@ export class Controller {
                 if(y*BLOCK_HEIGHT-this._ball.r > this._ball.y) return false;
             }
             else if(yOf === -1 ){
-                if(y*BLOCK_HEIGHT+this._ball.r < this._ball.y) return false;
+                if((y+1)*BLOCK_HEIGHT+this._ball.r < this._ball.y) return false;
             } else {
             //    xOf === 0, yOf === 0;
             }
@@ -95,7 +96,7 @@ export class Controller {
 
         
         if(curGridOnTrace) {
-            
+            console.log('crashed')
             switch(xOf) {
                 case 0:
                     if(yOf === 1) return {block: curGridOnTrace, dir: 'down'}
@@ -168,8 +169,8 @@ export class Controller {
                     else if(v_d === 'down') {x_step = 0; y_step = 1;}
                     else {x_step = 0; y_step = 0;}
                     break;
-
             }
+            
             
             
             return this.recursiveTrace(h_d, v_d, x+x_step, y+y_step, x_step, y_step)        
@@ -210,19 +211,19 @@ export class Controller {
                     }
                     break;
                 case "up":
-                    point.y = crashed.block.y*crashed.block.height + crashed.block.height + this._ball.r;
+                    point.y = crashed.block.y + crashed.block.height + this._ball.r;
                     if(this._prevCoordinate.x !== this._ball.x) {
                         point.x = this.ballTrack(this._ball.x, point.y, true)
                     }
                     break;
                 case "left":
-                    point.x = crashed.block.x*crashed.block.width + crashed.block.width + this._ball.r;
+                    point.x = crashed.block.x + crashed.block.width + this._ball.r;
                     if(this._prevCoordinate.y !== this._ball.y) {
                         point.y = this.ballTrack(point.x, this._ball.y);
                     }
                     break;
                 case "right":
-                    point.x = crashed.block.x*crashed.block.width - this._ball.r;
+                    point.x = crashed.block.x - this._ball.r;
                     if(this._prevCoordinate.y !== this._ball.y) {
                         point.y = this.ballTrack(point.x, this._ball.y)
                     }
