@@ -4,9 +4,10 @@ export type BallDirection = 'up'|'down'|'left'|'right'
 export type Coordinate = {x: number, y: number}
 
 export class Ball extends GameObject {
-    private _gs: number = 0.9;
+    private static _gs: number = 0.9;
     private _gvs: number = 1;
     private _hvs: number = 0;
+    private static _hvs_step: number = 0.4
     private _r: number
 
     private static MAX_GVS = 15;
@@ -23,25 +24,33 @@ export class Ball extends GameObject {
 
     move(dir: BallDirection) {
         switch(dir) {
-            case "down":                
-                this.y += this._gs * this._gvs;
-                this._gvs += 2;
-                
-                break;
-            case "up":
-                this.y += this._gs * this._gvs;
-                this._gvs += 2;
-                
-                break;
-            case "left":
-                this.x += this._hvs;
-                if(this._hvs > -Ball.MAX_HVS) this._hvs -= 0.2;
+            case "down": this.y += Ball._gs * this._gvs; this._gvs += 2; break;
+            case "up": this.y += Ball._gs * this._gvs; this._gvs += 2; break;
+            case "left": 
+                // this.x += this._hvs; 
+                if(this._hvs > -Ball.MAX_HVS) this._hvs -= Ball._hvs_step;
                 break;
             case "right":
-                this.x += this._hvs;
-                
-                if(this._hvs < Ball.MAX_HVS) this._hvs += 0.2;
+                // this.x += this._hvs;
+                if(this._hvs < Ball.MAX_HVS) this._hvs += Ball._hvs_step;
+                break;
         }
+    }
+
+    h_stop() {
+        const step = Ball._hvs_step
+        if(this._hvs > 0) {
+            if(this._hvs < step) this._hvs = 0;
+            else this._hvs -= step; 
+        }
+        else if(this._hvs < 0) {
+            if(this._hvs > -step) this._hvs = 0;
+            else this._hvs += step;
+        }
+    }
+
+    h_move() {
+        this.x += this._hvs;
     }
     
     bounce() {

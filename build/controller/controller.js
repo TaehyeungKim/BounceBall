@@ -1,7 +1,9 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../constant.js";
+import { KeyboardObserver } from "./key.js";
 export class Controller {
     constructor(ball, map) {
         this._intervalId = 0;
+        this._keyObserver = new KeyboardObserver();
         this._canvas = document.createElement('canvas');
         this._canvas.width = CANVAS_WIDTH;
         this._canvas.height = CANVAS_HEIGHT;
@@ -29,7 +31,6 @@ export class Controller {
     recursiveTrace(h_d, v_d, x = h_d === "right" ? Math.floor((this._prevCoordinate.x + this._ball.r) / BLOCK_WIDTH) :
         h_d === "left" ? Math.floor((this._prevCoordinate.x - this._ball.r) / BLOCK_WIDTH) : Math.floor(this._prevCoordinate.x / BLOCK_WIDTH), y = v_d === "down" ? Math.floor((this._prevCoordinate.y + this._ball.r) / BLOCK_HEIGHT) :
         v_d === "up" ? Math.floor((this._prevCoordinate.y - this._ball.r) / BLOCK_HEIGHT) : Math.floor((this._prevCoordinate.y) / BLOCK_HEIGHT), xOf = 0, yOf = 0) {
-        console.log(x, y);
         //recursion end point
         if (h_d === "center" && v_d === "center") {
             return false;
@@ -208,6 +209,8 @@ export class Controller {
             var _a;
             (_a = this._canvas.getContext("2d")) === null || _a === void 0 ? void 0 : _a.reset();
             this._ball.bounce();
+            this.ball_h_acc();
+            this.ball_h_move();
             this.judgeBallCrash();
             this.renderBall();
             this.renderMap();
@@ -240,8 +243,16 @@ export class Controller {
     generateBlock(x, y, w, h, type) {
         this._map.pushBlock(x, y, w, h, type);
     }
-    ballMove(dir) {
-        this._ball.move(dir);
+    ball_h_acc() {
+        if (this._keyObserver.right)
+            this._ball.move("right");
+        if (this._keyObserver.left)
+            this._ball.move("left");
+        if (!this._keyObserver.right && !this._keyObserver.left)
+            this._ball.h_stop();
+    }
+    ball_h_move() {
+        this._ball.h_move();
     }
     attachCanvas(root) {
         root.appendChild(this._canvas);

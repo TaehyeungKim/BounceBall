@@ -2,6 +2,7 @@ import { Ball, Coordinate, BallDirection } from "../ball/ball.js";
 import { BlockType, Block } from "../block/baseBl.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../constant.js";
 import { Map } from "../map/map.js";
+import { KeyboardObserver } from "./key.js";
 
 type BallConstructor = {
     new(x:number, y:number, width:number, height: number): Ball;
@@ -25,6 +26,8 @@ export class Controller {
     private _intervalId: number = 0;
     private _map: Map;
     private _prevCoordinate: Coordinate
+
+    protected _keyObserver: KeyboardObserver = new KeyboardObserver();
 
     constructor(ball: BallConstructor, map: MapConstructor) {
         this._canvas = document.createElement('canvas');
@@ -57,7 +60,6 @@ export class Controller {
         xOf:1|0|-1=0, yOf:1|0|-1=0,
         ):CrashInfo|false {
 
-        console.log(x,y)
         
         //recursion end point
         if(h_d === "center" && v_d === "center") {
@@ -235,8 +237,9 @@ export class Controller {
         this._intervalId = setInterval(()=>{
             this._canvas.getContext("2d")?.reset()
             this._ball.bounce()
-            
-            
+            this.ball_h_acc();
+            this.ball_h_move()
+
             this.judgeBallCrash();
             
 
@@ -279,8 +282,14 @@ export class Controller {
         this._map.pushBlock(x,y,w,h,type)
     }
 
-    ballMove(dir:BallDirection) {
-        this._ball.move(dir);
+    ball_h_acc() {
+        if(this._keyObserver.right) this._ball.move("right");
+        if(this._keyObserver.left) this._ball.move("left");
+        if(!this._keyObserver.right && !this._keyObserver.left) this._ball.h_stop();
+    }
+
+    ball_h_move() {
+        this._ball.h_move()
     }
 
 

@@ -2,7 +2,6 @@ import { GameObject } from "../baseObj.js";
 export class Ball extends GameObject {
     constructor(x, y, w, h) {
         super(x, y, w, h);
-        this._gs = 0.9;
         this._gvs = 1;
         this._hvs = 0;
         this._r = w / 2;
@@ -13,23 +12,42 @@ export class Ball extends GameObject {
     move(dir) {
         switch (dir) {
             case "down":
-                this.y += this._gs * this._gvs;
+                this.y += Ball._gs * this._gvs;
                 this._gvs += 2;
                 break;
             case "up":
-                this.y += this._gs * this._gvs;
+                this.y += Ball._gs * this._gvs;
                 this._gvs += 2;
                 break;
             case "left":
-                this.x += this._hvs;
+                // this.x += this._hvs; 
                 if (this._hvs > -Ball.MAX_HVS)
-                    this._hvs -= 0.2;
+                    this._hvs -= Ball._hvs_step;
                 break;
             case "right":
-                this.x += this._hvs;
+                // this.x += this._hvs;
                 if (this._hvs < Ball.MAX_HVS)
-                    this._hvs += 0.2;
+                    this._hvs += Ball._hvs_step;
+                break;
         }
+    }
+    h_stop() {
+        const step = Ball._hvs_step;
+        if (this._hvs > 0) {
+            if (this._hvs < step)
+                this._hvs = 0;
+            else
+                this._hvs -= step;
+        }
+        else if (this._hvs < 0) {
+            if (this._hvs > -step)
+                this._hvs = 0;
+            else
+                this._hvs += step;
+        }
+    }
+    h_move() {
+        this.x += this._hvs;
     }
     bounce() {
         if (this._gvs > 0)
@@ -60,5 +78,7 @@ export class Ball extends GameObject {
         this.y = point.y;
     }
 }
+Ball._gs = 0.9;
+Ball._hvs_step = 0.4;
 Ball.MAX_GVS = 15;
 Ball.MAX_HVS = 10;
