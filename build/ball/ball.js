@@ -20,12 +20,10 @@ export class Ball extends GameObject {
                 this._gvs += Ball._gvs_step;
                 break;
             case "left":
-                // this.x += this._hvs; 
                 if (this._hvs > -Ball.MAX_HVS)
                     this._hvs -= Ball._hvs_step;
                 break;
             case "right":
-                // this.x += this._hvs;
                 if (this._hvs < Ball.MAX_HVS)
                     this._hvs += Ball._hvs_step;
                 break;
@@ -63,7 +61,6 @@ export class Ball extends GameObject {
                     this._gvs = Ball.MAX_GVS;
                 break;
             case "down":
-                // this._gvs = - this._gvs;
                 this._gvs = -Ball.MAX_GVS;
                 if (this._gvs < -Ball.MAX_GVS)
                     this._gvs = -Ball.MAX_GVS;

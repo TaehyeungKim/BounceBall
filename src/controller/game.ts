@@ -14,10 +14,10 @@ export class Game extends Controller {
         this.attachCanvas(root)
         for(let i = 0; i < (CANVAS_WIDTH/BLOCK_WIDTH); i++) {
             for(let j = i; j < (CANVAS_HEIGHT/BLOCK_HEIGHT); j++) {
-                this.generateBlock(j,14-j,BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
+                this.generateBlock(j, 14-i,BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
             }
             
-            // this.generateBlock(i,11,BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
+            this.generateBlock(i,11,BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
         }
         // for(let j = 0; j < (CANVAS_HEIGHT/BLOCK_HEIGHT);j++) {
         //     this.generateBlock(15, j, BLOCK_WIDTH, BLOCK_HEIGHT, "Normal")

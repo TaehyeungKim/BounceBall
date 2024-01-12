@@ -8,7 +8,7 @@ export class Ball extends GameObject {
     private _gvs: number = 1;
     private _hvs: number = 0;
     private static _hvs_step: number = 0.05;
-    private static _gvs_step: number = 0.05;
+    private static _gvs_step: number = 0.05
     private _r: number
 
     private static MAX_GVS = 1.7;
