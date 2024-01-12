@@ -4,14 +4,15 @@ export type BallDirection = 'up'|'down'|'left'|'right'
 export type Coordinate = {x: number, y: number}
 
 export class Ball extends GameObject {
-    private static _gs: number = 0.9;
+    private static _gs: number = 1.8;
     private _gvs: number = 1;
     private _hvs: number = 0;
-    private static _hvs_step: number = 0.4
+    private static _hvs_step: number = 0.05;
+    private static _gvs_step: number = 0.05;
     private _r: number
 
-    private static MAX_GVS = 15;
-    private static MAX_HVS = 10;
+    private static MAX_GVS = 1.7;
+    private static MAX_HVS = 1.7;
 
     constructor(x:number,y:number,w:number,h:number) {
         super(x,y,w,h)
@@ -24,8 +25,8 @@ export class Ball extends GameObject {
 
     move(dir: BallDirection) {
         switch(dir) {
-            case "down": this.y += Ball._gs * this._gvs; this._gvs += 2; break;
-            case "up": this.y += Ball._gs * this._gvs; this._gvs += 2; break;
+            case "down": this.y += Ball._gs * this._gvs; this._gvs += Ball._gvs_step; break;
+            case "up": this.y += Ball._gs * this._gvs; this._gvs += Ball._gvs_step; break;
             case "left": 
                 // this.x += this._hvs; 
                 if(this._hvs > -Ball.MAX_HVS) this._hvs -= Ball._hvs_step;
@@ -66,7 +67,8 @@ export class Ball extends GameObject {
                 
                 break;
             case "down":
-                this._gvs = - this._gvs;
+                // this._gvs = - this._gvs;
+                this._gvs = -Ball.MAX_GVS;
                 
                 if(this._gvs < -Ball.MAX_GVS) this._gvs = -Ball.MAX_GVS;
                 

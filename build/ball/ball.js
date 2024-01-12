@@ -13,11 +13,11 @@ export class Ball extends GameObject {
         switch (dir) {
             case "down":
                 this.y += Ball._gs * this._gvs;
-                this._gvs += 2;
+                this._gvs += Ball._gvs_step;
                 break;
             case "up":
                 this.y += Ball._gs * this._gvs;
-                this._gvs += 2;
+                this._gvs += Ball._gvs_step;
                 break;
             case "left":
                 // this.x += this._hvs; 
@@ -63,7 +63,8 @@ export class Ball extends GameObject {
                     this._gvs = Ball.MAX_GVS;
                 break;
             case "down":
-                this._gvs = -this._gvs;
+                // this._gvs = - this._gvs;
+                this._gvs = -Ball.MAX_GVS;
                 if (this._gvs < -Ball.MAX_GVS)
                     this._gvs = -Ball.MAX_GVS;
                 break;
@@ -78,7 +79,8 @@ export class Ball extends GameObject {
         this.y = point.y;
     }
 }
-Ball._gs = 0.9;
-Ball._hvs_step = 0.4;
-Ball.MAX_GVS = 15;
-Ball.MAX_HVS = 10;
+Ball._gs = 1.8;
+Ball._hvs_step = 0.05;
+Ball._gvs_step = 0.05;
+Ball.MAX_GVS = 1.7;
+Ball.MAX_HVS = 1.7;
