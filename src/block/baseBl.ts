@@ -1,6 +1,7 @@
 import { GameObject } from "../baseObj.js";
+import { BLOCK_HEIGHT, BLOCK_WIDTH } from "../constant.js";
 
-export type BlockType = 'Normal'|'Jump'|'Fragile'|'WormholeStart'|'WormholeEnd'
+export type BlockType = 'Normal'|'Jump'|'Fragile'|'WormholeStart'|'WormholeEnd'|"End"
 type BlockRenderSetting = {
     innerColor: string,
     outerColor: string,
@@ -50,6 +51,11 @@ const BLOCK_SETTING:Readonly<BlockSettingSet> = Object.freeze({
         innerColor: "#c9b2e1",
         outerColor: "white",
         paddingRatio: 10
+    },
+    End: {
+        innerColor: "black",
+        outerColor: "black",
+        paddingRatio: 0
     }
 })
 
@@ -66,8 +72,8 @@ export class Block<T extends BlockType> extends GameObject implements BlockI<T> 
     private _renderSetting: BlockRenderSetting
     
     
-    constructor(x:number, y:number, width: number, height: number, private _type: BlockType, private _opt?: BlockAdditionalSetting<T>) {
-        super(x,y,width,height)
+    constructor(x:number, y:number, private _type: BlockType, private _opt?: BlockAdditionalSetting<T>) {
+        super(x,y,BLOCK_WIDTH, BLOCK_HEIGHT)
         
         this._renderSetting = BLOCK_SETTING[this._type]
         

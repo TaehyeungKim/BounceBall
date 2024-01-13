@@ -1,4 +1,5 @@
 import { GameObject } from "../baseObj.js";
+import { BLOCK_HEIGHT, BLOCK_WIDTH } from "../constant.js";
 const BLOCK_SETTING = Object.freeze({
     Normal: {
         innerColor: 'black',
@@ -24,11 +25,16 @@ const BLOCK_SETTING = Object.freeze({
         innerColor: "#c9b2e1",
         outerColor: "white",
         paddingRatio: 10
+    },
+    End: {
+        innerColor: "black",
+        outerColor: "black",
+        paddingRatio: 0
     }
 });
 export class Block extends GameObject {
-    constructor(x, y, width, height, _type, _opt) {
-        super(x, y, width, height);
+    constructor(x, y, _type, _opt) {
+        super(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
         this._type = _type;
         this._opt = _opt;
         this._renderSetting = BLOCK_SETTING[this._type];

@@ -3,6 +3,7 @@ import { BlockType, Block, BlockAdditionalSetting } from "../block/baseBl.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../constant.js";
 import { Map } from "../map/map.js";
 import { KeyboardObserver } from "./key.js";
+import { stageBnd } from "../map/stage.js";
 
 type BallConstructor = {
     new(x:number, y:number, width:number, height: number): Ball;
@@ -34,6 +35,7 @@ export class Controller {
     private _intervalId: number = 0;
     private _map: Map;
     private _prevCoordinate: Coordinate
+    protected _stage: number
 
     protected _keyObserver: KeyboardObserver = new KeyboardObserver();
 
@@ -44,6 +46,7 @@ export class Controller {
         this._canvas.style.backgroundColor = 'black'
         this._ball = new ball(10,100,5,5);
         this._map = new map()
+        this._stage = 1;
 
         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
     }
@@ -482,9 +485,15 @@ export class Controller {
 
     private updateBlockPropertyByCrash(info: CrashInfo) {
         switch(info.block.type) {
+
             case "Fragile":
                 this._map.deleteBlock(info.block.x/BLOCK_WIDTH, info.block.y/BLOCK_HEIGHT)
                 break;
+            case "End":
+                this._map.initializeMatrix();
+                this.toNextStage();
+                stageBnd[this._stage](this.generateBlock.bind(this), this.initializeBall.bind(this))
+
         }
     }
 
@@ -516,8 +525,8 @@ export class Controller {
         })
     }
 
-    generateBlock<T extends BlockType>(x:number, y:number, w:number, h:number, type: BlockType, opt?: BlockAdditionalSetting<T>) {
-        this._map.pushBlock(x,y,w,h,type, opt)
+    generateBlock<T extends BlockType>(x:number, y:number, type: BlockType, opt?: BlockAdditionalSetting<T>) {
+        this._map.pushBlock(x,y,type, opt)
     }
 
     ball_h_acc() {
@@ -533,6 +542,14 @@ export class Controller {
     initializeBall(coord: Coordinate) {
         this._prevCoordinate.x = coord.x; this._prevCoordinate.y = coord.y
         this._ball.initializeBall(coord)
+    }
+
+    private toNextStage() {
+        this._stage += 1;
+    }
+
+    private toPrevStage() {
+        this._stage -= 1;
     }
 
 

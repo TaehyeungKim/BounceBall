@@ -1,6 +1,7 @@
 import { Ball } from "../ball/ball.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../constant.js";
 import { KeyboardObserver } from "./key.js";
+import { stageBnd } from "../map/stage.js";
 export class Controller {
     constructor(ball, map) {
         this._intervalId = 0;
@@ -11,6 +12,7 @@ export class Controller {
         this._canvas.style.backgroundColor = 'black';
         this._ball = new ball(10, 100, 5, 5);
         this._map = new map();
+        this._stage = 1;
         this._prevCoordinate = { x: this._ball.x, y: this._ball.y };
     }
     marginBallTrack(x, y, dir) {
@@ -255,6 +257,10 @@ export class Controller {
             case "Fragile":
                 this._map.deleteBlock(info.block.x / BLOCK_WIDTH, info.block.y / BLOCK_HEIGHT);
                 break;
+            case "End":
+                this._map.initializeMatrix();
+                this.toNextStage();
+                stageBnd[this._stage](this.generateBlock.bind(this), this.initializeBall.bind(this));
         }
     }
     renderStop() {
@@ -280,8 +286,8 @@ export class Controller {
             });
         });
     }
-    generateBlock(x, y, w, h, type, opt) {
-        this._map.pushBlock(x, y, w, h, type, opt);
+    generateBlock(x, y, type, opt) {
+        this._map.pushBlock(x, y, type, opt);
     }
     ball_h_acc() {
         if (this._keyObserver.right)
@@ -298,6 +304,12 @@ export class Controller {
         this._prevCoordinate.x = coord.x;
         this._prevCoordinate.y = coord.y;
         this._ball.initializeBall(coord);
+    }
+    toNextStage() {
+        this._stage += 1;
+    }
+    toPrevStage() {
+        this._stage -= 1;
     }
     attachCanvas(root) {
         root.appendChild(this._canvas);

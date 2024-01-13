@@ -88,6 +88,8 @@ export class Ball extends GameObject {
     initializeBall(coord) {
         this.x = coord.x;
         this.y = coord.y;
+        this._gvs = 0;
+        this._hvs = 0;
     }
 }
 Ball._gs = 1.8;

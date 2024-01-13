@@ -29,25 +29,25 @@ export class Map {
         }
     }
 
-    pushBlock<T extends BlockType>(x:number,y:number,w:number,h:number,type: T, opt?: BlockAdditionalSetting<T>) {
+    pushBlock<T extends BlockType>(x:number,y:number,type: T, opt?: BlockAdditionalSetting<T>) {
         if(x >= CANVAS_WIDTH/BLOCK_WIDTH || y >= CANVAS_HEIGHT/BLOCK_HEIGHT) throw new Error('unvaild coordinate, so can\'t generate block');
 
         if(type === "WormholeStart") {
             if(!opt) throw new Error("wormhole should have extra option")
-            const startBlock = new Block<"WormholeStart">(x*BLOCK_WIDTH, y*BLOCK_HEIGHT, w,h,type, opt as BlockAdditionalSetting<"WormholeStart">)
+            const startBlock = new Block<"WormholeStart">(x*BLOCK_WIDTH, y*BLOCK_HEIGHT, type, opt as BlockAdditionalSetting<"WormholeStart">)
             this._matrix[y][x] = startBlock
 
             const option = opt as BlockAdditionalSetting<"WormholeStart">;
             const endBlock = new Block<"WormholeEnd">(
                 option.x_endPoint*BLOCK_WIDTH, 
                 option.y_endPoint*BLOCK_HEIGHT, 
-                w, h, "WormholeEnd",{start: false})
+                "WormholeEnd",{start: false})
             this._matrix[option.y_endPoint][option.x_endPoint] = endBlock;
 
             return ;
         }
         
-        const block = new Block<T>(x*BLOCK_WIDTH,y*BLOCK_HEIGHT,w,h,type)
+        const block = new Block<T>(x*BLOCK_WIDTH,y*BLOCK_HEIGHT,type)
         
         this._matrix[y][x] = block;
     }

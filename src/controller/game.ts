@@ -8,16 +8,16 @@ import { stageBnd } from "../map/stage.js";
 
 export class Game extends Controller {
 
-    private _stage: number
+    
 
     constructor() {
         super(Ball, Map)
-        this._stage = 0;
+        
     }
 
     play(root: HTMLElement) {
         this.attachCanvas(root)
-        stageBnd[`stage_${this._stage}`](this.generateBlock.bind(this), this.initializeBall.bind(this))
+        stageBnd[this._stage](this.generateBlock.bind(this), this.initializeBall.bind(this))
         // for(let i = 0; i < (CANVAS_WIDTH/BLOCK_WIDTH); i++) {
         //     if(i === 10) this.generateBlock(i,11,BLOCK_WIDTH, BLOCK_HEIGHT, 'Jump')
         //     else if( i === 30) this.generateBlock(i,11,BLOCK_WIDTH, BLOCK_HEIGHT, 'Fragile')
@@ -46,13 +46,5 @@ export class Game extends Controller {
             }
         }) 
             
-    }
-
-    toNextStage() {
-        this._stage += 1;
-    }
-
-    toPrevStage() {
-        this._stage -= 1;
     }
 }
