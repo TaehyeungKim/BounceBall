@@ -5,17 +5,23 @@ export class Map {
         this._matrix = [];
         this._horizontalN = CANVAS_WIDTH / BLOCK_WIDTH;
         this._verticalN = CANVAS_HEIGHT / BLOCK_HEIGHT;
-        this.initializeMatrix();
+        for (let i = 0; i < this._verticalN; i++) {
+            const row = [];
+            for (let j = 0; j < this._horizontalN; j++)
+                row.push(null);
+            this._matrix.push(row);
+        }
     }
     get matrix() {
         return this._matrix;
     }
     initializeMatrix() {
         for (let i = 0; i < this._verticalN; i++) {
-            const row = [];
-            for (let j = 0; j < this._horizontalN; j++)
-                row.push(null);
-            this._matrix.push(row);
+            for (let j = 0; j < this._horizontalN; j++) {
+                if (this._matrix[i][j])
+                    this.deleteBlock(j, i);
+            }
+            ;
         }
     }
     pushBlock(x, y, w, h, type, opt) {

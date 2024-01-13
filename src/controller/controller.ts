@@ -16,6 +16,14 @@ type CrashInfo = {
     block: Block<BlockType>,
     dir: BallDirection
 }
+export interface BlockGenerator<T extends BlockType> {
+    x:number, 
+    y:number, 
+    w:number, 
+    h:number, 
+    type: BlockType, 
+    opt?: BlockAdditionalSetting<T>
+}
 
 
 
@@ -449,7 +457,7 @@ export class Controller {
             case "right":
                 this._ball.x = opt.x_endPoint*BLOCK_WIDTH + info.block.width + this._ball.r;
                 this._ball.y = (2*opt.y_endPoint*BLOCK_HEIGHT + info.block.height)/2;
-                console.log(this._ball.x, this._ball.y)
+                
                 break;
             case "left":
                 this._ball.x = opt.x_endPoint*BLOCK_WIDTH - this._ball.r;
@@ -520,6 +528,11 @@ export class Controller {
 
     ball_h_move() {
         this._ball.h_move()
+    }
+
+    initializeBall(coord: Coordinate) {
+        this._prevCoordinate.x = coord.x; this._prevCoordinate.y = coord.y
+        this._ball.initializeBall(coord)
     }
 
 

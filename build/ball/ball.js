@@ -85,6 +85,10 @@ export class Ball extends GameObject {
     updateHvsEnd(hvs) {
         this._hvs_end = hvs;
     }
+    initializeBall(coord) {
+        this.x = coord.x;
+        this.y = coord.y;
+    }
 }
 Ball._gs = 1.8;
 Ball._hvs_step = 0.05;

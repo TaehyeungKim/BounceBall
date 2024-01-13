@@ -99,4 +99,8 @@ export class Ball extends GameObject {
         this._hvs_end = hvs;
     }
 
+    initializeBall(coord: Coordinate) {
+        this.x = coord.x; this.y = coord.y
+    }
+
 }
