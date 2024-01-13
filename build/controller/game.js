@@ -1,7 +1,7 @@
 import { Controller } from "./controller.js";
 import { Ball } from "../ball/ball.js";
 import { Map } from "../map/map.js";
-import { BLOCK_HEIGHT, BLOCK_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT } from "../constant.js";
+import { BLOCK_HEIGHT, BLOCK_WIDTH, CANVAS_WIDTH } from "../constant.js";
 export class Game extends Controller {
     constructor() {
         super(Ball, Map);
@@ -9,11 +9,18 @@ export class Game extends Controller {
     play(root) {
         this.attachCanvas(root);
         for (let i = 0; i < (CANVAS_WIDTH / BLOCK_WIDTH); i++) {
-            for (let j = i; j < (CANVAS_HEIGHT / BLOCK_HEIGHT); j++) {
-                this.generateBlock(j, 14 - i, BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal');
-            }
-            this.generateBlock(i, 11, BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal');
+            if (i === 10)
+                this.generateBlock(i, 11, BLOCK_WIDTH, BLOCK_HEIGHT, 'Jump');
+            else if (i === 30)
+                this.generateBlock(i, 11, BLOCK_WIDTH, BLOCK_HEIGHT, 'Fragile');
+            else
+                this.generateBlock(i, 11, BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal');
         }
+        this.generateBlock(13, 22, BLOCK_WIDTH, BLOCK_HEIGHT, "WormholeStart", {
+            start: true,
+            x_endPoint: 13,
+            y_endPoint: 9
+        });
         this.renderAnimation();
         window.addEventListener('keydown', (e) => {
             if (e.key === "ArrowLeft" || "ArrowRight" || "ArrowUp" || "ArorwDown") {

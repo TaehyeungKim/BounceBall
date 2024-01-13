@@ -11,8 +11,11 @@ export class Ball extends GameObject {
     private static _gvs_step: number = 0.05
     private _r: number
 
-    private static MAX_GVS = 1.7;
-    private static MAX_HVS = 1.7;
+    static readonly MAX_GVS = 1.7;
+    static readonly MAX_HVS = 1.7;
+
+    private _gvs_end = Ball.MAX_GVS;
+    private _hvs_end = Ball.MAX_HVS;
 
     constructor(x:number,y:number,w:number,h:number) {
         super(x,y,w,h)
@@ -29,11 +32,11 @@ export class Ball extends GameObject {
             case "up": this.y += Ball._gs * this._gvs; this._gvs += Ball._gvs_step; break;
             case "left": 
                 // this.x += this._hvs; 
-                if(this._hvs > -Ball.MAX_HVS) this._hvs -= Ball._hvs_step;
+                if(this._hvs > -this._hvs_end) this._hvs -= Ball._hvs_step;
                 break;
             case "right":
                 // this.x += this._hvs;
-                if(this._hvs < Ball.MAX_HVS) this._hvs += Ball._hvs_step;
+                if(this._hvs < this._hvs_end) this._hvs += Ball._hvs_step;
                 break;
         }
     }
@@ -63,14 +66,14 @@ export class Ball extends GameObject {
         switch(crashDir) {
             case "up":
                 this._gvs = -this._gvs;
-                if(this._gvs > Ball.MAX_GVS) this._gvs = Ball.MAX_GVS;
+                if(this._gvs > this._gvs_end) this._gvs = this._gvs_end;
                 
                 break;
             case "down":
-                // this._gvs = - this._gvs;
-                this._gvs = -Ball.MAX_GVS;
                 
-                if(this._gvs < -Ball.MAX_GVS) this._gvs = -Ball.MAX_GVS;
+                this._gvs = -this._gvs_end;
+                
+                if(this._gvs < -this._gvs_end) this._gvs = -this._gvs_end;
                 
                 break;
             case "left":
@@ -83,6 +86,17 @@ export class Ball extends GameObject {
                 break;
         }
         this.x = point.x; this.y = point.y
+    }
+
+    get gvs_end() {return this._gvs_end}
+    get hvs_end() {return this._hvs_end}
+
+    updateGvsEnd(gvs: number) {
+        this._gvs_end = gvs
+    }
+
+    updateHvsEnd(hvs: number) {
+        this._hvs_end = hvs;
     }
 
 }

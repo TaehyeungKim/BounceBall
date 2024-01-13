@@ -1,5 +1,5 @@
 import { Ball, Coordinate, BallDirection } from "../ball/ball.js";
-import { BlockType, Block } from "../block/baseBl.js";
+import { BlockType, Block, BlockAdditionalSetting } from "../block/baseBl.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../constant.js";
 import { Map } from "../map/map.js";
 import { KeyboardObserver } from "./key.js";
@@ -13,7 +13,7 @@ type MapConstructor = {
 }
 
 type CrashInfo = {
-    block: Block,
+    block: Block<BlockType>,
     dir: BallDirection
 }
 
@@ -231,7 +231,7 @@ export class Controller {
                 this._ball.bounce()
                 this.ball_h_acc();
                 this.ball_h_move()
-                this.newJudgeBallCrash();
+                this.judgeBallCrash();
     
                 this.renderBall();
                 this.renderMap();
@@ -242,7 +242,7 @@ export class Controller {
         window.requestAnimationFrame(animStep)
     }
 
-    ballCrashInfo(h_d: 'left'|'right'|'center', v_d: 'up'|'down'|'center'):CrashInfo|false {
+    private ballCrashInfo(h_d: 'left'|'right'|'center', v_d: 'up'|'down'|'center'):CrashInfo|false {
 
         //if the ball penetrates the edge of the block
         const a = (this._prevCoordinate.y - this._ball.y)/(this._prevCoordinate.x - this._ball.x);
@@ -258,7 +258,7 @@ export class Controller {
                         if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]) {
                                 console.log(h_d, v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x] as Block, dir: "right"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]!, dir: "right"}
                             }
                         }
                     }
@@ -268,7 +268,7 @@ export class Controller {
                         if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]) {
                                 console.log(h_d,v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1] as Block, dir: "up"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]!, dir: "up"}
                             }
                         }
                     }
@@ -280,7 +280,7 @@ export class Controller {
                         if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]) {
                                 console.log(h_d, v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1] as Block, dir: "down"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]!, dir: "down"}
                             }
                         }
                     }
@@ -290,7 +290,7 @@ export class Controller {
                         if(y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]) {
                                 console.log(h_d, v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x] as Block, dir: "right"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]!, dir: "right"}
                             }
                         }
                     }
@@ -305,7 +305,7 @@ export class Controller {
                         if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]) {
                                 console.log(h_d, v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x] as Block, dir: "down"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]!, dir: "down"}
                             } 
                         }
                     }
@@ -315,7 +315,7 @@ export class Controller {
                         if(y >= this._prevCoordinate.y - this._ball.r && y<=this._ball.y - this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]) {
                                 console.log(h_d, v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1] as Block, dir: "left"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]!, dir: "left"}
                             }
                         }
                     }
@@ -327,7 +327,7 @@ export class Controller {
                         if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]){
                                 console.log(h_d, v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x] as Block, dir: "up"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x]!, dir: "up"}
                             }
                         }
                         
@@ -339,7 +339,7 @@ export class Controller {
                         if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r) {
                             if(this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]) {
                                 console.log(h_d, v_d)
-                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1] as Block, dir: "left"}
+                                return {block: this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1]!, dir: "left"}
                             }
                         }
                     }
@@ -361,24 +361,24 @@ export class Controller {
 
         if(this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)] && 
         this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)]
-        ) return {block:this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)] as Block, dir: "down"}
+        ) return {block:this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)]!, dir: "down"}
 
         if(this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)]&&
         this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)]
-        ) return {block: this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)] as Block, dir: "up"}
+        ) return {block: this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)]!, dir: "up"}
 
         if(this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)]&&
         this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_left/BLOCK_WIDTH)]
-        ) return {block: this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_left/BLOCK_WIDTH)] as Block, dir: "left"}
+        ) return {block: this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_left/BLOCK_WIDTH)]!, dir: "left"}
 
         if(this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)] && 
         this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_right/BLOCK_WIDTH)]
-        ) return {block: this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_right/BLOCK_WIDTH)] as Block, dir: "right"}
+        ) return {block: this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_right/BLOCK_WIDTH)]!, dir: "right"}
         
         return false
     }
 
-    newJudgeBallCrash() {
+    judgeBallCrash() {
         let h_d: 'left'|'right'|'center'; let v_d: 'up'|'down'|'center'
 
         if(this._ball.x > this._prevCoordinate.x) h_d = 'right';
@@ -394,10 +394,9 @@ export class Controller {
             this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
             return false
         }
-        // console.log(crashed)
         
 
-
+        this.updateBallPropertyByCrash(crashed)
         
         const point:Coordinate = {x: this._ball.x, y: this._ball.y}
         
@@ -430,78 +429,29 @@ export class Controller {
         }
         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
         this._ball.crash(crashed.dir, point)   
+        this.updateBlockPropertyByCrash(crashed)
     }
 
-
-    // judgeBallCrash() {
-    //     let h_d: 'left'|'right'|'center'; let v_d: 'up'|'down'|'center'
-
-    //     if(this._ball.x > this._prevCoordinate.x) h_d = 'right';
-    //     else if(this._ball.x === this._prevCoordinate.x) h_d = 'center';
-    //     else h_d = 'left';
-
-    //     if(this._ball.y > this._prevCoordinate.y) v_d = 'down';
-    //     else if(this._ball.y === this._prevCoordinate.y) v_d = 'center';
-    //     else v_d = 'up'
-
-
-    //     const crashed = this.recursiveTrace(h_d, v_d);
-        
-        
-
-    //     const point:Coordinate = {x: this._ball.x, y: this._ball.y}
-
-    //     if(crashed) {
-    //         switch(crashed.dir) {
-    //             case "down":
-    //                 point.y = crashed.block.y - this._ball.r
-                
-                    
-    //                 if(this._prevCoordinate.x !== this._ball.x) {
-    //                     point.x = this.ballTrack(this._ball.x, point.y, true)    
-    //                 }
-    //                 break;
-    //             case "up":
-    //                 point.y = crashed.block.y + crashed.block.height + this._ball.r;
-    //                 if(this._prevCoordinate.x !== this._ball.x) {
-    //                     point.x = this.ballTrack(this._ball.x, point.y, true)
-    //                 }
-    //                 break;
-    //             case "right":
-    //                 point.x = crashed.block.x - this._ball.r;
-    //                 if(this._prevCoordinate.y !== this._ball.y) {
-    //                     point.y = this.ballTrack(point.x, this._ball.y);
-    //                 }
-    //                 break;
-    //             case "left":
-    //                 point.x = crashed.block.x + crashed.block.width +this._ball.r;
-    //                 if(this._prevCoordinate.y !== this._ball.y) {
-    //                     point.y = this.ballTrack(point.x, this._ball.y)
-    //                 }
-    //                 break;
-    //         }
-    //         this._ball.crash(crashed.dir, point)
-    //     }
-        
-    // }
-
-    // registerRenderInterval() {
-    //     this._intervalId = setInterval(()=>{
-    //         this._canvas.getContext("2d")?.reset()
-    //         this._ball.bounce()
-    //         this.ball_h_acc();
-    //         this.ball_h_move()
-
-    //         this.judgeBallCrash();
+    private updateBallPropertyByCrash(info: CrashInfo) {
+        switch(info.block.type) {
+            default:
+                this._ball.updateGvsEnd(Ball.MAX_GVS)
+                break;
+            case "Jump":
+                this._ball.updateGvsEnd(1.7*Ball.MAX_GVS)
+                break;
             
+        }
+    }
 
-    //         this.renderBall();
-    //         this.renderMap();
-            
+    private updateBlockPropertyByCrash(info: CrashInfo) {
+        switch(info.block.type) {
+            case "Fragile":
+                this._map.deleteBlock(info.block.x/BLOCK_WIDTH, info.block.y/BLOCK_HEIGHT)
+                break;
+        }
+    }
 
-    //         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
-    //     },50)
-    // }
 
     renderStop() {
         clearInterval(this._intervalId)
@@ -530,8 +480,8 @@ export class Controller {
         })
     }
 
-    generateBlock(x:number, y:number, w:number, h:number, type: BlockType) {
-        this._map.pushBlock(x,y,w,h,type)
+    generateBlock<T extends BlockType>(x:number, y:number, w:number, h:number, type: BlockType, opt?: BlockAdditionalSetting<T>) {
+        this._map.pushBlock(x,y,w,h,type, opt)
     }
 
     ball_h_acc() {

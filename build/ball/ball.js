@@ -4,6 +4,8 @@ export class Ball extends GameObject {
         super(x, y, w, h);
         this._gvs = 1;
         this._hvs = 0;
+        this._gvs_end = Ball.MAX_GVS;
+        this._hvs_end = Ball.MAX_HVS;
         this._r = w / 2;
     }
     get r() {
@@ -20,11 +22,11 @@ export class Ball extends GameObject {
                 this._gvs += Ball._gvs_step;
                 break;
             case "left":
-                if (this._hvs > -Ball.MAX_HVS)
+                if (this._hvs > -this._hvs_end)
                     this._hvs -= Ball._hvs_step;
                 break;
             case "right":
-                if (this._hvs < Ball.MAX_HVS)
+                if (this._hvs < this._hvs_end)
                     this._hvs += Ball._hvs_step;
                 break;
         }
@@ -57,13 +59,13 @@ export class Ball extends GameObject {
         switch (crashDir) {
             case "up":
                 this._gvs = -this._gvs;
-                if (this._gvs > Ball.MAX_GVS)
-                    this._gvs = Ball.MAX_GVS;
+                if (this._gvs > this._gvs_end)
+                    this._gvs = this._gvs_end;
                 break;
             case "down":
-                this._gvs = -Ball.MAX_GVS;
-                if (this._gvs < -Ball.MAX_GVS)
-                    this._gvs = -Ball.MAX_GVS;
+                this._gvs = -this._gvs_end;
+                if (this._gvs < -this._gvs_end)
+                    this._gvs = -this._gvs_end;
                 break;
             case "left":
                 this._hvs = -this._hvs;
@@ -74,6 +76,14 @@ export class Ball extends GameObject {
         }
         this.x = point.x;
         this.y = point.y;
+    }
+    get gvs_end() { return this._gvs_end; }
+    get hvs_end() { return this._hvs_end; }
+    updateGvsEnd(gvs) {
+        this._gvs_end = gvs;
+    }
+    updateHvsEnd(hvs) {
+        this._hvs_end = hvs;
     }
 }
 Ball._gs = 1.8;

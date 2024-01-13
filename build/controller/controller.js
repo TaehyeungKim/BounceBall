@@ -1,3 +1,4 @@
+import { Ball } from "../ball/ball.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../constant.js";
 import { KeyboardObserver } from "./key.js";
 export class Controller {
@@ -42,7 +43,7 @@ export class Controller {
                 this._ball.bounce();
                 this.ball_h_acc();
                 this.ball_h_move();
-                this.newJudgeBallCrash();
+                this.judgeBallCrash();
                 this.renderBall();
                 this.renderMap();
             }
@@ -160,7 +161,7 @@ export class Controller {
             return { block: this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_right / BLOCK_WIDTH)], dir: "right" };
         return false;
     }
-    newJudgeBallCrash() {
+    judgeBallCrash() {
         let h_d;
         let v_d;
         if (this._ball.x > this._prevCoordinate.x)
@@ -180,6 +181,7 @@ export class Controller {
             this._prevCoordinate = { x: this._ball.x, y: this._ball.y };
             return false;
         }
+        this.updateBallPropertyByCrash(crashed);
         const point = { x: this._ball.x, y: this._ball.y };
         switch (crashed.dir) {
             case "down":
@@ -209,6 +211,24 @@ export class Controller {
         }
         this._prevCoordinate = { x: this._ball.x, y: this._ball.y };
         this._ball.crash(crashed.dir, point);
+        this.updateBlockPropertyByCrash(crashed);
+    }
+    updateBallPropertyByCrash(info) {
+        switch (info.block.type) {
+            default:
+                this._ball.updateGvsEnd(Ball.MAX_GVS);
+                break;
+            case "Jump":
+                this._ball.updateGvsEnd(1.7 * Ball.MAX_GVS);
+                break;
+        }
+    }
+    updateBlockPropertyByCrash(info) {
+        switch (info.block.type) {
+            case "Fragile":
+                this._map.deleteBlock(info.block.x / BLOCK_WIDTH, info.block.y / BLOCK_HEIGHT);
+                break;
+        }
     }
     renderStop() {
         clearInterval(this._intervalId);
@@ -233,8 +253,8 @@ export class Controller {
             });
         });
     }
-    generateBlock(x, y, w, h, type) {
-        this._map.pushBlock(x, y, w, h, type);
+    generateBlock(x, y, w, h, type, opt) {
+        this._map.pushBlock(x, y, w, h, type, opt);
     }
     ball_h_acc() {
         if (this._keyObserver.right)
