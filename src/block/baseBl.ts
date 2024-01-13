@@ -64,14 +64,13 @@ interface BlockI<T extends BlockType> {
 
 export class Block<T extends BlockType> extends GameObject implements BlockI<T> {
     private _renderSetting: BlockRenderSetting
-    private _type: BlockType
-    private _opt?: BlockAdditionalSetting<T>
     
-    constructor(x:number, y:number, width: number, height: number, type: BlockType, opt?: BlockAdditionalSetting<T>) {
+    
+    constructor(x:number, y:number, width: number, height: number, private _type: BlockType, private _opt?: BlockAdditionalSetting<T>) {
         super(x,y,width,height)
-        this._type = type;
-        this._renderSetting = BLOCK_SETTING[type]
-        if(opt) this._opt = opt
+        
+        this._renderSetting = BLOCK_SETTING[this._type]
+        
     }
 
     get renderSetting() {
@@ -82,7 +81,8 @@ export class Block<T extends BlockType> extends GameObject implements BlockI<T> 
     }
 
     get opt() {
+        console.log(this._opt, this._type)
         if(this._opt) return this._opt
-        throw new Error("additional option is not defined!!")
+        else throw new Error("additional option is not defined!!")
     }
 }

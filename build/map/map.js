@@ -29,6 +29,7 @@ export class Map {
             const option = opt;
             const endBlock = new Block(option.x_endPoint * BLOCK_WIDTH, option.y_endPoint * BLOCK_HEIGHT, w, h, "WormholeEnd", { start: false });
             this._matrix[option.y_endPoint][option.x_endPoint] = endBlock;
+            return;
         }
         const block = new Block(x * BLOCK_WIDTH, y * BLOCK_HEIGHT, w, h, type);
         this._matrix[y][x] = block;

@@ -20,11 +20,13 @@ export class Game extends Controller {
             else if( i === 30) this.generateBlock(i,11,BLOCK_WIDTH, BLOCK_HEIGHT, 'Fragile')
             else this.generateBlock(i, 11, BLOCK_WIDTH, BLOCK_HEIGHT, 'Normal')
         }
-        this.generateBlock(13, 22, BLOCK_WIDTH, BLOCK_HEIGHT, "WormholeStart", {
+        this.generateBlock(13, 9, BLOCK_WIDTH, BLOCK_HEIGHT, "WormholeStart", {
             start: true,
             x_endPoint: 13,
-            y_endPoint: 9
+            y_endPoint: 22
         });
+
+
 
         this.renderAnimation();
 

@@ -28,14 +28,17 @@ export class Map {
 
         if(type === "WormholeStart") {
             if(!opt) throw new Error("wormhole should have extra option")
-            const startBlock = new Block(x*BLOCK_WIDTH, y*BLOCK_HEIGHT, w,h,type, opt)
+            const startBlock = new Block<"WormholeStart">(x*BLOCK_WIDTH, y*BLOCK_HEIGHT, w,h,type, opt as BlockAdditionalSetting<"WormholeStart">)
             this._matrix[y][x] = startBlock
+
             const option = opt as BlockAdditionalSetting<"WormholeStart">;
             const endBlock = new Block<"WormholeEnd">(
                 option.x_endPoint*BLOCK_WIDTH, 
                 option.y_endPoint*BLOCK_HEIGHT, 
                 w, h, "WormholeEnd",{start: false})
             this._matrix[option.y_endPoint][option.x_endPoint] = endBlock;
+
+            return ;
         }
         
         const block = new Block<T>(x*BLOCK_WIDTH,y*BLOCK_HEIGHT,w,h,type)

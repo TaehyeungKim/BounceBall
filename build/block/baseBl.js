@@ -27,12 +27,11 @@ const BLOCK_SETTING = Object.freeze({
     }
 });
 export class Block extends GameObject {
-    constructor(x, y, width, height, type, opt) {
+    constructor(x, y, width, height, _type, _opt) {
         super(x, y, width, height);
-        this._type = type;
-        this._renderSetting = BLOCK_SETTING[type];
-        if (opt)
-            this._opt = opt;
+        this._type = _type;
+        this._opt = _opt;
+        this._renderSetting = BLOCK_SETTING[this._type];
     }
     get renderSetting() {
         return this._renderSetting;
@@ -41,8 +40,10 @@ export class Block extends GameObject {
         return this._type;
     }
     get opt() {
+        console.log(this._opt, this._type);
         if (this._opt)
             return this._opt;
-        throw new Error("additional option is not defined!!");
+        else
+            throw new Error("additional option is not defined!!");
     }
 }

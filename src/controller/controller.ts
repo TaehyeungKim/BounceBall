@@ -428,8 +428,35 @@ export class Controller {
                 break;
         }
         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
-        this._ball.crash(crashed.dir, point)   
+        if(crashed.block.type === "WormholeStart") this.wormholeBlockTransfer(crashed);
+        else this._ball.crash(crashed.dir, point)
+           
         this.updateBlockPropertyByCrash(crashed)
+    }
+
+    private wormholeBlockTransfer(info: CrashInfo) {
+        const opt = info.block.opt as BlockAdditionalSetting<"WormholeStart">
+        
+        switch(info.dir) {
+            case "down":
+                this._ball.x = (2*opt.x_endPoint*BLOCK_WIDTH + info.block.width)/2;
+                this._ball.y = opt.y_endPoint*BLOCK_HEIGHT + info.block.height + this._ball.r
+                break;
+            case "up":
+                this._ball.x = (2*opt.x_endPoint*BLOCK_WIDTH + info.block.width)/2;
+                this._ball.y = opt.y_endPoint*BLOCK_HEIGHT - this._ball.r
+                break;
+            case "right":
+                this._ball.x = opt.x_endPoint*BLOCK_WIDTH + info.block.width + this._ball.r;
+                this._ball.y = (2*opt.y_endPoint*BLOCK_HEIGHT + info.block.height)/2;
+                console.log(this._ball.x, this._ball.y)
+                break;
+            case "left":
+                this._ball.x = opt.x_endPoint*BLOCK_WIDTH - this._ball.r;
+                this._ball.y = (2*opt.y_endPoint*BLOCK_HEIGHT + info.block.height)/2;;
+                break;
+        }
+        this._prevCoordinate.x = this._ball.x; this._prevCoordinate.y = this._ball.y
     }
 
     private updateBallPropertyByCrash(info: CrashInfo) {
@@ -440,6 +467,7 @@ export class Controller {
             case "Jump":
                 this._ball.updateGvsEnd(1.7*Ball.MAX_GVS)
                 break;
+            
             
         }
     }
