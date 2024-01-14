@@ -1,10 +1,12 @@
 import { GameObject } from "../baseObj.js";
 import { BLOCK_HEIGHT, BLOCK_WIDTH } from "../constant.js";
 
-export type BlockType = 'Normal'|'Jump'|'Fragile'|'WormholeStart'|'WormholeEnd'|"End"
+export type BlockType = 'Normal'|'Jump'|'Fragile'|'WormholeStart'|'WormholeEnd'|"End"|"Bomb"
+export type ColorFuncByTimeStamp = (time: DOMHighResTimeStamp)=>string
+
 type BlockRenderSetting = {
-    innerColor: string,
-    outerColor: string,
+    innerColor: string|ColorFuncByTimeStamp
+    outerColor: string|ColorFuncByTimeStamp,
     paddingRatio: number
 }
 
@@ -45,7 +47,7 @@ const BLOCK_SETTING:Readonly<BlockSettingSet> = Object.freeze({
     WormholeStart: {
         innerColor: "#c9b2e1",
         outerColor: "yellow",
-        paddingRatio: 10
+        paddingRatio: 4
     },
     WormholeEnd: {
         innerColor: "#c9b2e1",
@@ -53,9 +55,17 @@ const BLOCK_SETTING:Readonly<BlockSettingSet> = Object.freeze({
         paddingRatio: 10
     },
     End: {
+        outerColor: time=>{
+            if(time%2000 < 1000) return `rgb(${(time%2000)*255/1000}, ${(time%2000)*255/1000}, 255)`
+            else return `rgb(${255*2- (time%2000)*255/1000}, ${255*2- (time%2000)*255/1000}, 255)`
+        },
         innerColor: "black",
-        outerColor: "black",
         paddingRatio: 0
+    },
+    Bomb: {
+        innerColor:"red",
+        outerColor:"white",
+        paddingRatio: 10
     }
 })
 
@@ -87,7 +97,7 @@ export class Block<T extends BlockType> extends GameObject implements BlockI<T> 
     }
 
     get opt() {
-        console.log(this._opt, this._type)
+
         if(this._opt) return this._opt
         else throw new Error("additional option is not defined!!")
     }

@@ -1,5 +1,5 @@
 import { Ball, Coordinate, BallDirection } from "../ball/ball.js";
-import { BlockType, Block, BlockAdditionalSetting } from "../block/baseBl.js";
+import { BlockType, Block, BlockAdditionalSetting, ColorFuncByTimeStamp } from "../block/baseBl.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../constant.js";
 import { Map } from "../map/map.js";
 import { KeyboardObserver } from "./key.js";
@@ -35,18 +35,23 @@ export class Controller {
     private _intervalId: number = 0;
     private _map: Map;
     private _prevCoordinate: Coordinate
+
+    private _animID: number = 0;
+    private _stop: boolean = false;
+
     protected _stage: number
 
     protected _keyObserver: KeyboardObserver = new KeyboardObserver();
 
     constructor(ball: BallConstructor, map: MapConstructor) {
         this._canvas = document.createElement('canvas');
+        this._canvas.classList.add('game');
         this._canvas.width = CANVAS_WIDTH;
         this._canvas.height = CANVAS_HEIGHT;
         this._canvas.style.backgroundColor = 'black'
         this._ball = new ball(10,100,5,5);
         this._map = new map()
-        this._stage = 1;
+        this._stage = 0;
 
         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
     }
@@ -243,15 +248,22 @@ export class Controller {
                 this.ball_h_acc();
                 this.ball_h_move()
                 this.judgeBallCrash();
-    
+                if(this._stop) {
+                    window.cancelAnimationFrame(this._animID)
+                    this.renderBall();
+                    this.renderMap(time);
+                    return ;
+                }
                 this.renderBall();
-                this.renderMap();
+                this.renderMap(time);
             
             }
-            window.requestAnimationFrame(animStep)
+            this._animID = window.requestAnimationFrame(animStep)
         }
-        window.requestAnimationFrame(animStep)
+        this._animID = window.requestAnimationFrame(animStep)
     }
+
+    
 
     private ballCrashInfo(h_d: 'left'|'right'|'center', v_d: 'up'|'down'|'center'):CrashInfo|false {
 
@@ -493,6 +505,10 @@ export class Controller {
                 this._map.initializeMatrix();
                 this.toNextStage();
                 stageBnd[this._stage](this.generateBlock.bind(this), this.initializeBall.bind(this))
+                break;
+            case "Bomb":
+                this._stop = true;
+                break;
 
         }
     }
@@ -509,15 +525,22 @@ export class Controller {
         context.fill()
     }
 
-    renderMap() {
+    renderMap(time: DOMHighResTimeStamp) {
         const context = this._canvas.getContext("2d") as CanvasRenderingContext2D;
         this._map.matrix.forEach(row=>{
             row.forEach(e=>{
                 if(e) {
-                    context.fillStyle = e.renderSetting.outerColor;
+                    if(e.type === "End") {    
+                        context.fillStyle = (e.renderSetting.outerColor as ColorFuncByTimeStamp)(time)
+                    }
+                    else {
+                        context.fillStyle = e.renderSetting.outerColor as string
+                    }
+                    
+                    
                     context.fillRect(e.x, e.y, e.width, e.height);
 
-                    context.fillStyle = e.renderSetting.innerColor;
+                    context.fillStyle = e.renderSetting.innerColor as string;
                     const [x_padding, y_padding] = [e.width/e.renderSetting.paddingRatio,e.height/e.renderSetting.paddingRatio]
                     context.fillRect(e.x + x_padding, e.y + y_padding, e.width - 2*x_padding, e.height - 2*y_padding)
                 } 

@@ -5,14 +5,17 @@ import { stageBnd } from "../map/stage.js";
 export class Controller {
     constructor(ball, map) {
         this._intervalId = 0;
+        this._animID = 0;
+        this._stop = false;
         this._keyObserver = new KeyboardObserver();
         this._canvas = document.createElement('canvas');
+        this._canvas.classList.add('game');
         this._canvas.width = CANVAS_WIDTH;
         this._canvas.height = CANVAS_HEIGHT;
         this._canvas.style.backgroundColor = 'black';
         this._ball = new ball(10, 100, 5, 5);
         this._map = new map();
-        this._stage = 1;
+        this._stage = 0;
         this._prevCoordinate = { x: this._ball.x, y: this._ball.y };
     }
     marginBallTrack(x, y, dir) {
@@ -46,12 +49,18 @@ export class Controller {
                 this.ball_h_acc();
                 this.ball_h_move();
                 this.judgeBallCrash();
+                if (this._stop) {
+                    window.cancelAnimationFrame(this._animID);
+                    this.renderBall();
+                    this.renderMap(time);
+                    return;
+                }
                 this.renderBall();
-                this.renderMap();
+                this.renderMap(time);
             }
-            window.requestAnimationFrame(animStep);
+            this._animID = window.requestAnimationFrame(animStep);
         };
-        window.requestAnimationFrame(animStep);
+        this._animID = window.requestAnimationFrame(animStep);
     }
     ballCrashInfo(h_d, v_d) {
         const a = (this._prevCoordinate.y - this._ball.y) / (this._prevCoordinate.x - this._ball.x);
@@ -261,6 +270,10 @@ export class Controller {
                 this._map.initializeMatrix();
                 this.toNextStage();
                 stageBnd[this._stage](this.generateBlock.bind(this), this.initializeBall.bind(this));
+                break;
+            case "Bomb":
+                this._stop = true;
+                break;
         }
     }
     renderStop() {
@@ -272,12 +285,17 @@ export class Controller {
         context.ellipse(this._ball.x, this._ball.y, this._ball.r, this._ball.r, 0, 0, 360);
         context.fill();
     }
-    renderMap() {
+    renderMap(time) {
         const context = this._canvas.getContext("2d");
         this._map.matrix.forEach(row => {
             row.forEach(e => {
                 if (e) {
-                    context.fillStyle = e.renderSetting.outerColor;
+                    if (e.type === "End") {
+                        context.fillStyle = e.renderSetting.outerColor(time);
+                    }
+                    else {
+                        context.fillStyle = e.renderSetting.outerColor;
+                    }
                     context.fillRect(e.x, e.y, e.width, e.height);
                     context.fillStyle = e.renderSetting.innerColor;
                     const [x_padding, y_padding] = [e.width / e.renderSetting.paddingRatio, e.height / e.renderSetting.paddingRatio];

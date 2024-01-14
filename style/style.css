@@ -1,0 +1,35 @@
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.frame {
+    width: 100vw;
+    height: 98vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 255, 255);
+}
+
+.root {
+    max-width: 700px;
+    
+    /* width: min(100vw, calc(100vh * 24/35));  */
+    width: 100vw;
+    
+    max-height: 100vh;
+}
+
+@media (max-height: 480px) {
+    .root {
+        width: auto;
+        height: 100%;
+    }
+}
+
+.game {
+    width: 100%;
+    height: 100%;
+}

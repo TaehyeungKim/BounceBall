@@ -19,7 +19,7 @@ const BLOCK_SETTING = Object.freeze({
     WormholeStart: {
         innerColor: "#c9b2e1",
         outerColor: "yellow",
-        paddingRatio: 10
+        paddingRatio: 4
     },
     WormholeEnd: {
         innerColor: "#c9b2e1",
@@ -27,9 +27,19 @@ const BLOCK_SETTING = Object.freeze({
         paddingRatio: 10
     },
     End: {
+        outerColor: time => {
+            if (time % 2000 < 1000)
+                return `rgb(${(time % 2000) * 255 / 1000}, ${(time % 2000) * 255 / 1000}, 255)`;
+            else
+                return `rgb(${255 * 2 - (time % 2000) * 255 / 1000}, ${255 * 2 - (time % 2000) * 255 / 1000}, 255)`;
+        },
         innerColor: "black",
-        outerColor: "black",
         paddingRatio: 0
+    },
+    Bomb: {
+        innerColor: "red",
+        outerColor: "white",
+        paddingRatio: 10
     }
 });
 export class Block extends GameObject {
@@ -46,7 +56,6 @@ export class Block extends GameObject {
         return this._type;
     }
     get opt() {
-        console.log(this._opt, this._type);
         if (this._opt)
             return this._opt;
         else
