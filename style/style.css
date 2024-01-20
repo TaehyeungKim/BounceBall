@@ -1,7 +1,21 @@
+:root {
+    --title-under-bar: 20%;
+    --thumbnail-button-background-color: #B39CD0;
+    --resume-button-background-color: #EC3A3A;
+}
+
 
 body {
     margin: 0;
     padding: 0;
+    background-image: url("./background.png");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+canvas {
+    background-color: rgba(0,0,0,0.4);
 }
 
 .frame {
@@ -11,15 +25,113 @@ body {
     align-items: center;
     justify-content: center;
     color: rgb(255, 255, 255);
+    flex-direction: column;
+    
 }
 
 .root {
+    position: relative;
     max-width: 700px;
     
     /* width: min(100vw, calc(100vh * 24/35));  */
     width: 100vw;
     
     max-height: 100vh;
+    
+}
+
+.thumbnailFrame {
+    position: absolute;
+    
+    left: 0; right: 0;
+    top: 0; bottom: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thumbnail {
+    width: 60%;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.title {
+    text-align: center;
+    font-size: 2em;
+    position: relative;
+    width: fit-content;
+    margin: 0 auto 0;
+    display: block;
+    margin-bottom: 0.4em;
+
+}
+
+.title::after {
+    content: "";
+    width: var(--title-under-bar);
+    position: absolute;
+    bottom: 0;
+    top: 99%;
+    background-color: white;
+    animation: underTitleAnim 3s ease-in-out alternate infinite;
+}
+
+.stage {
+    font-size: 6em;
+    color: yellow;
+    opacity: 0.5;
+}
+
+@keyframes underTitleAnim {
+    0% {
+        left: 0;
+        
+    }
+    100% {
+        left: calc(100% - var(--title-under-bar));
+        
+    }
+}
+
+.belowSection {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.startButton, .resumeButton {
+    all: unset;
+    padding: 0.5em;
+    
+    border-radius: 0.5em;
+    margin: 0 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.startButton {
+    background-color: var(--thumbnail-button-background-color);
+    color: white;
+}
+
+.resumeButton {
+    background-color: var(--resume-button-background-color);
+    color: white;
+}
+
+.startButton:hover {
+    background-color: white;
+    color: var(--thumbnail-button-background-color);
+}
+
+.resumeButton:hover {
+    background-color: white;
+    color: var(--resume-button-background-color);
 }
 
 @media (max-height: 480px) {
@@ -33,3 +145,31 @@ body {
     width: 100%;
     height: 100%;
 }
+
+.deadMessage-container, .clearMessage-container {
+    width: 60%;
+    height: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.deadMessage, .clearMessage {
+    
+    width: fit-content;
+    text-align: center;
+    margin: 0 auto 0.4em;
+    position: relative;
+}
+
+.deadMessage {
+    color:  red;
+    font-size: 4em;
+}
+
+.clearMessage {
+    color: yellow;
+    font-size: 2em;
+}
+

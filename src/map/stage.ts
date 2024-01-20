@@ -6,7 +6,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT } from "../const
 type StageGenerator = {
     [k in number]: (generator: (
         x:number, y:number,type: BlockType, opt?: BlockAdditionalSetting<BlockType>
-    )=>void, initializer: (coord: Coordinate)=>void) => void
+    )=>void, initializer: (coord: Coordinate)=>void) => void|true
 }
 
 const h_end = CANVAS_WIDTH/BLOCK_WIDTH - 1;
@@ -135,5 +135,8 @@ export const stageBnd: StageGenerator = {
         for(let j = 0; j <= v_end-1; j++) {
             g(h_end, j, "End")
         }
+    },
+    4: (g,i) => {
+        return true
     }
 }

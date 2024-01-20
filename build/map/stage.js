@@ -148,5 +148,8 @@ export const stageBnd = {
         for (let j = 0; j <= v_end - 1; j++) {
             g(h_end, j, "End");
         }
+    },
+    4: (g, i) => {
+        return true;
     }
 };
