@@ -4,7 +4,6 @@ import { KeyboardObserver } from "./key.js";
 import { stageBnd } from "../map/stage.js";
 export class Controller {
     constructor(ball, map) {
-        this._intervalId = 0;
         this._animID = 0;
         this._stop = false;
         this._clear = false;
@@ -17,7 +16,6 @@ export class Controller {
         this._map = new map();
         this._stage = 0;
         this._prevCoordinate = { x: this._ball.x, y: this._ball.y };
-        this._stageBackgroundRenderer = undefined;
     }
     marginBallTrack(x, y, dir) {
         const a = (this._prevCoordinate.y - this._ball.y) / (this._prevCoordinate.x - this._ball.x);
@@ -42,7 +40,6 @@ export class Controller {
             return ((prevY - curY) / (prevX - curX)) * (x - prevX) + prevY;
     }
     renderAnimation() {
-        console.log(this._stop, this._clear);
         const animStep = (time) => {
             var _a;
             if (this) {
@@ -64,6 +61,13 @@ export class Controller {
         };
         this._animID = window.requestAnimationFrame(animStep);
     }
+    checkAndConfirm(grid, array, dir) {
+        if (grid) {
+            const tempBlockArray = array.map(c => c.block);
+            if (!tempBlockArray.includes(grid))
+                array.push({ block: grid, dir });
+        }
+    }
     ballCrashInfo(h_d, v_d) {
         const crashArray = [];
         const a = (this._prevCoordinate.y - this._ball.y) / (this._prevCoordinate.x - this._ball.x);
@@ -73,37 +77,25 @@ export class Controller {
                 if (v_d === "up") {
                     for (let x = Math.floor((this._prevCoordinate.x + xOf) / BLOCK_WIDTH); x <= Math.floor((this._ball.x + xOf) / BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "down");
-                        if (y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], dir: "right" });
-                            }
-                        }
+                        if (y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], crashArray, "right");
                     }
                     for (let x = Math.floor((this._prevCoordinate.x - xOf) / BLOCK_WIDTH); x <= Math.floor((this._ball.x - xOf) / BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "up");
-                        if (y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], dir: "up" });
-                            }
-                        }
+                        if (y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], crashArray, "up");
                     }
                 }
                 else if (v_d === "down") {
                     for (let x = Math.floor((this._prevCoordinate.x - xOf) / BLOCK_WIDTH); x <= Math.floor((this._ball.x - xOf) / BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "down");
-                        if (y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], dir: "down" });
-                            }
-                        }
+                        if (y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], crashArray, "down");
                     }
                     for (let x = Math.floor((this._prevCoordinate.x + xOf) / BLOCK_WIDTH); x <= Math.floor((this._ball.x + xOf) / BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "up");
-                        if (y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], dir: "right" });
-                            }
-                        }
+                        if (y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], crashArray, "right");
                     }
                 }
                 break;
@@ -111,37 +103,25 @@ export class Controller {
                 if (v_d === "down") {
                     for (let x = Math.floor((this._prevCoordinate.x + xOf) / BLOCK_WIDTH); x >= Math.floor((this._ball.x + xOf) / BLOCK_WIDTH); x--) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "down");
-                        if (y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], dir: "down" });
-                            }
-                        }
+                        if (y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], crashArray, "down");
                     }
                     for (let x = Math.floor((this._prevCoordinate.x - xOf) / BLOCK_WIDTH); x >= Math.floor((this._ball.x - xOf) / BLOCK_WIDTH); x--) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "up");
-                        if (y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], dir: "left" });
-                            }
-                        }
+                        if (y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], crashArray, "left");
                     }
                 }
                 else if (v_d === "up") {
                     for (let x = Math.floor((this._prevCoordinate.x + xOf) / BLOCK_WIDTH); x >= Math.floor((this._ball.x + xOf) / BLOCK_WIDTH); x--) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "up");
-                        if (y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], dir: "up" });
-                            }
-                        }
+                        if (y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x], crashArray, "up");
                     }
                     for (let x = Math.floor((this._prevCoordinate.x - xOf) / BLOCK_WIDTH); x >= Math.floor((this._ball.x - xOf) / BLOCK_WIDTH); x--) {
                         const y = this.marginBallTrack(x * BLOCK_WIDTH, 0, "down");
-                        if (y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r) {
-                            if (this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1]) {
-                                crashArray.push({ block: this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], dir: "left" });
-                            }
-                        }
+                        if (y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r)
+                            this.checkAndConfirm(this._map.matrix[Math.floor(y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y / BLOCK_HEIGHT)][x - 1], crashArray, "left");
                     }
                 }
                 break;
@@ -153,30 +133,10 @@ export class Controller {
             this._ball.y - this._ball.r,
             this._ball.y + this._ball.r
         ];
-        if (this._map.matrix[Math.floor(m_down / BLOCK_HEIGHT)] &&
-            this._map.matrix[Math.floor(m_down / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)]) {
-            if (crashArray.filter(crashInfo => crashInfo.block === this._map.matrix[Math.floor(m_down / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)]).length === 0) {
-                crashArray.push({ block: this._map.matrix[Math.floor(m_down / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)], dir: "down" });
-            }
-        }
-        if (this._map.matrix[Math.floor(m_up / BLOCK_HEIGHT)] &&
-            this._map.matrix[Math.floor(m_up / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)]) {
-            if (crashArray.filter(c => c.block === this._map.matrix[Math.floor(m_up / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)]).length === 0) {
-                crashArray.push({ block: this._map.matrix[Math.floor(m_up / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)], dir: "up" });
-            }
-        }
-        if (this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)] &&
-            this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_left / BLOCK_WIDTH)]) {
-            if (crashArray.filter(c => c.block === this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_left / BLOCK_WIDTH)]).length === 0) {
-                crashArray.push({ block: this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_left / BLOCK_WIDTH)], dir: "left" });
-            }
-        }
-        if (this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)] &&
-            this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_right / BLOCK_WIDTH)]) {
-            if (crashArray.filter(c => c.block === this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_right / BLOCK_WIDTH)]).length === 0) {
-                crashArray.push({ block: this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_right / BLOCK_WIDTH)], dir: "right" });
-            }
-        }
+        this.checkAndConfirm(this._map.matrix[Math.floor(m_down / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(m_down / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)], crashArray, "down");
+        this.checkAndConfirm(this._map.matrix[Math.floor(m_up / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(m_up / BLOCK_HEIGHT)][Math.floor(this._ball.x / BLOCK_WIDTH)], crashArray, "up");
+        this.checkAndConfirm(this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_left / BLOCK_WIDTH)], crashArray, "left");
+        this.checkAndConfirm(this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)] && this._map.matrix[Math.floor(this._ball.y / BLOCK_HEIGHT)][Math.floor(m_right / BLOCK_WIDTH)], crashArray, "right");
         if (crashArray.length !== 0)
             return crashArray;
         return false;
