@@ -19,7 +19,12 @@ const BLOCK_SETTING = Object.freeze({
     WormholeStart: {
         innerColor: "#c9b2e1",
         outerColor: "yellow",
-        paddingRatio: 4
+        paddingRatio: time => {
+            if (time % 2000 < 1000)
+                return (1 / 3000 * (time % 2000));
+            else
+                return -1 / 3000 * (time % 2000) + 2 / 3;
+        }
     },
     WormholeEnd: {
         innerColor: "#c9b2e1",

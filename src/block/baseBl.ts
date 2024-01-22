@@ -3,11 +3,12 @@ import { BLOCK_HEIGHT, BLOCK_WIDTH } from "../constant.js";
 
 export type BlockType = 'Normal'|'Jump'|'Fragile'|'WormholeStart'|'WormholeEnd'|"End"|"Bomb"
 export type ColorFuncByTimeStamp = (time: DOMHighResTimeStamp)=>string
+export type PaddingFuncByTimeStamp = (time: DOMHighResTimeStamp) => number
 
 type BlockRenderSetting = {
     innerColor: string|ColorFuncByTimeStamp
     outerColor: string|ColorFuncByTimeStamp,
-    paddingRatio: number
+    paddingRatio: number|PaddingFuncByTimeStamp
 }
 
 type BlockSettingSet = {
@@ -47,7 +48,10 @@ const BLOCK_SETTING:Readonly<BlockSettingSet> = Object.freeze({
     WormholeStart: {
         innerColor: "#c9b2e1",
         outerColor: "yellow",
-        paddingRatio: 4
+        paddingRatio: time=>{
+            if(time%2000 < 1000) return (1/3000*(time%2000))
+            else return -1/3000*(time%2000)+2/3
+        }
     },
     WormholeEnd: {
         innerColor: "#c9b2e1",

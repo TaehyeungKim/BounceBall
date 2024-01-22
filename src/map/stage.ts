@@ -110,6 +110,7 @@ export const stageBnd: StageGenerator = {
             for(let j = k-1; j < Math.floor((h_end/4))*1-3; j++) g(k, j+(v_end-12), "Normal")
         }
         g(3,3,"WormholeStart", {x_endPoint: 13, y_endPoint: 13, start: true})
+        
 
         for(let j = 1; j < 4; j++) g(Math.floor((h_end/4))*1 + j, v_end-4, "Normal")
         g(Math.floor((h_end/4))*1 + 4, v_end-4, "Jump")

@@ -1,9 +1,10 @@
 import { Ball, Coordinate, BallDirection } from "../ball/ball.js";
-import { BlockType, Block, BlockAdditionalSetting, ColorFuncByTimeStamp } from "../block/baseBl.js";
+import { BlockType, Block, BlockAdditionalSetting, ColorFuncByTimeStamp, PaddingFuncByTimeStamp } from "../block/baseBl.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT} from "../constant.js";
 import { Map } from "../map/map.js";
 import { KeyboardObserver } from "./key.js";
 import { stageBnd } from "../map/stage.js";
+import { BounceAudio } from "../effect/sound.js";
 
 type BallConstructor = {
     new(x:number, y:number, width:number, height: number): Ball;
@@ -47,6 +48,7 @@ export class Controller {
     protected _gameDeadMessageRenderer:(()=>void)|undefined
     protected _gameClearMessageRenderer:(()=>void)|undefined
 
+
     constructor(ball: BallConstructor, map: MapConstructor) {
         this._canvas = document.createElement('canvas');
         this._canvas.classList.add('game');
@@ -58,6 +60,7 @@ export class Controller {
         this._stage = 0;
 
         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
+        
         
     }
 
@@ -486,11 +489,15 @@ export class Controller {
             this.updateBlockPropertyByCrash(crashed)
 
 
-        })
-        
-        
-        
-        
+        })    
+    }
+
+    private bounceAudioPlay(type: BlockType) {
+        const audio = BounceAudio[type]
+        if(audio) {
+            audio.currentTime = 0;
+            audio.play();
+        }
     }
 
     private wormholeBlockTransfer(info: CrashInfo) {
@@ -521,11 +528,23 @@ export class Controller {
     private updateBallPropertyByCrash(info: CrashInfo) {
         switch(info.block.type) {
             default:
+                this.bounceAudioPlay(info.block.type)
+                this._ball.updateGvsEnd(Ball.MAX_GVS)
+                break;
+            case "Bomb":
+            case "Fragile":
+                if(info.dir === "down") this.bounceAudioPlay(info.block.type);
+                else this.bounceAudioPlay("Normal");
                 this._ball.updateGvsEnd(Ball.MAX_GVS)
                 break;
             case "Jump":
-                this._ball.updateGvsEnd(1.7*Ball.MAX_GVS)
+                if(info.dir === "down") {
+                    this._ball.updateGvsEnd(1.7*Ball.MAX_GVS)
+                    this.bounceAudioPlay(info.block.type);
+                }
+                else this.bounceAudioPlay("Normal")
                 break;
+    
             
             
         }
@@ -535,7 +554,7 @@ export class Controller {
         switch(info.block.type) {
 
             case "Fragile":
-                this._map.deleteBlock(info.block.x/BLOCK_WIDTH, info.block.y/BLOCK_HEIGHT)
+                if(info.dir === "down") this._map.deleteBlock(info.block.x/BLOCK_WIDTH, info.block.y/BLOCK_HEIGHT)
                 break;
             case "End":
                 this._map.initializeMatrix();
@@ -547,8 +566,7 @@ export class Controller {
                 }
                 break;
             case "Bomb":
-
-                this.gameDead();
+                if(info.dir === "down") this.gameDead();
                 break;
 
         }
@@ -577,7 +595,15 @@ export class Controller {
                     context.fillRect(e.x, e.y, e.width, e.height);
 
                     context.fillStyle = e.renderSetting.innerColor as string;
-                    const [x_padding, y_padding] = [e.width/e.renderSetting.paddingRatio,e.height/e.renderSetting.paddingRatio]
+                    let [x_padding, y_padding] = [0,0]
+                    if(e.type === "WormholeStart") {
+                        const p = e.renderSetting.paddingRatio as PaddingFuncByTimeStamp
+                        x_padding = e.width*p(time); y_padding = e.height*p(time)
+                    } else {
+                        const p = e.renderSetting.paddingRatio as number;
+                        x_padding = e.width/p; y_padding = e.height/p
+                    }
+                    
                     context.fillRect(e.x + x_padding, e.y + y_padding, e.width - 2*x_padding, e.height - 2*y_padding)
                 } 
             })
