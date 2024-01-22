@@ -40,7 +40,7 @@ canvas {
     
 }
 
-.thumbnailFrame {
+.screenFrame {
     position: absolute;
     
     left: 0; right: 0;
@@ -51,7 +51,7 @@ canvas {
     justify-content: center;
 }
 
-.thumbnail {
+.init {
     width: 60%;
     height: 60%;
     display: flex;

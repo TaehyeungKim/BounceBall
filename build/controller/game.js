@@ -5,137 +5,118 @@ import { stageBnd } from "../map/stage.js";
 export class Game extends Controller {
     constructor() {
         super(Ball, Map);
-        this._thumbnailFrame = document.createElement("div");
-        this._thumbnailFrame.classList.add("thumbnailFrame");
-        this._initFrame = document.createElement("section");
-        this._initFrame.classList.add("thumbnail");
-        this._thumbnailFrame.appendChild(this._initFrame);
-        this._stageSpan = document.createElement("span");
-        this._stageSpan.classList.add("stage");
-        this._stageSpan.setAttribute('style', "display: none");
-        this._thumbnailFrame.appendChild(this._stageSpan);
-        this._deadMessageContainer = this.renderDeadMessage();
-        this._clearMessageContainer = this.renderClearMessage();
+        this._screenFrame = document.createElement("div");
+        this._screenFrame.classList.add("screenFrame");
+        this._stageSpan = this.renderScreenElement(`<span class="stage"></span>`);
+        this._init = this.renderScreenElement(`
+            <section class="init">
+                <h3 class="title">BOUNCEBALL</h3>
+                <section class="belowSection">
+                    <button class="startButton">START BUTTON</button>
+                    Or Press Enter
+                </section>  
+            </section>
+            `, (e) => {
+            e.querySelector(".startButton").addEventListener("click", () => {
+                this.firstGameStart();
+                this._init.remove();
+                window.removeEventListener("keydown", this._startByKey);
+            });
+        });
+        this._deadMessage = this.renderScreenElement(`<div class='deadMessage-container'>
+                <h3 class='deadMessage'>Game Over</h3><section class='belowSection'>
+                <button class='resumeButton'>Try Again?</button>Or Press Spacebar</section>
+            </div>`, (e) => {
+            e.querySelector('.resumeButton').addEventListener("click", () => {
+                this._resumer(this._stage, e);
+                window.removeEventListener("keydown", this._tryAgainByKey);
+            });
+        });
+        this._clearMessage = this.renderScreenElement(`
+            <div class="clearMessage-container">
+                <h3 class="clearMessage">🎉Congratulations🎉</h3>
+                <section class="belowSection">
+                    <button class="resumeButton">Try Again?</button>
+                    Or Press Spacebar
+                </section>
+            </div>
+            `, (e) => {
+            e.querySelector('.resumeButton').addEventListener("click", () => {
+                this._clear = false;
+                this._resumer(0, e);
+                window.removeEventListener("keydown", this._resumeByKey);
+            });
+        });
         this._stageBackgroundRenderer = () => {
             this._stageSpan.textContent = this._stage.toString();
         };
         this._tryAgainByKey = (e) => {
             if (e.key === " ") {
-                this._resumer(this._stage);
+                this._resumer(this._stage, this._deadMessage);
                 window.removeEventListener('keydown', this._tryAgainByKey);
             }
         };
         this._resumeByKey = (e) => {
             if (e.key === " ") {
-                this._resumer(0);
+                this._resumer(0, this._clearMessage);
                 this._clear = false;
                 window.removeEventListener('keydown', this._resumeByKey);
             }
         };
+        this._startByKey = (e) => {
+            if (e.key === "Enter") {
+                this.firstGameStart();
+                window.removeEventListener('keydown', this._startByKey);
+                this._init.remove();
+            }
+        };
         this._gameDeadMessageRenderer = () => {
             this.hideElement(this._stageSpan);
-            this.showElement(this._deadMessageContainer);
+            this.showElement(this._deadMessage);
             window.addEventListener('keydown', this._tryAgainByKey);
         };
         this._gameClearMessageRenderer = () => {
             this.hideElement(this._stageSpan);
-            this.showElement(this._clearMessageContainer);
+            this.showElement(this._clearMessage);
             window.addEventListener('keydown', this._resumeByKey);
         };
-        this._resumer = (stage) => {
-            this.hideElement(this._deadMessageContainer);
-            this.hideElement(this._clearMessageContainer);
+        this._resumer = (stage, message) => {
+            this.hideElement(message);
             this.showElement(this._stageSpan);
             this.resume(stage);
         };
     }
     showElement(e) {
-        e.removeAttribute('style');
+        this._screenFrame.appendChild(e);
     }
     hideElement(e) {
-        e.setAttribute('style', "display: none");
+        e.remove();
     }
-    renderClearMessage() {
-        const container = document.createElement("div");
-        container.classList.add('clearMessage-container');
-        container.setAttribute('style', "display: none");
-        const message = document.createElement("h3");
-        message.classList.add('clearMessage');
-        message.textContent = "🎉Congratulations🎉";
-        container.appendChild(message);
-        const belowSection = document.createElement("section");
-        belowSection.classList.add("belowSection");
-        const resumeButton = document.createElement("button");
-        resumeButton.classList.add("resumeButton");
-        resumeButton.addEventListener("click", () => {
-            this._clear = false;
-            this._resumer(0);
-        });
-        resumeButton.textContent = "Try Again?";
-        belowSection.appendChild(resumeButton);
-        const text = document.createTextNode(" Or Press Spacebar");
-        belowSection.appendChild(text);
-        container.appendChild(belowSection);
-        this._thumbnailFrame.appendChild(container);
-        return container;
+    renderScreenElement(htmlString, attachEventCallback) {
+        const template = document.createElement('template');
+        template.innerHTML = htmlString;
+        const element = template.content.firstElementChild;
+        attachEventCallback && attachEventCallback(element);
+        return element;
     }
-    renderDeadMessage() {
-        const container = document.createElement("div");
-        container.classList.add('deadMessage-container');
-        container.setAttribute('style', "display: none");
-        const message = document.createElement("h3");
-        message.classList.add('deadMessage');
-        message.textContent = "Game Over";
-        container.appendChild(message);
-        const belowSection = document.createElement("section");
-        belowSection.classList.add("belowSection");
-        const resumeButton = document.createElement("button");
-        resumeButton.classList.add("resumeButton");
-        resumeButton.addEventListener("click", () => this._resumer(this._stage));
-        resumeButton.textContent = "Try Again?";
-        belowSection.appendChild(resumeButton);
-        const text = document.createTextNode(" Or Press Spacebar");
-        belowSection.appendChild(text);
-        container.appendChild(belowSection);
-        this._thumbnailFrame.appendChild(container);
-        return container;
-    }
-    renderInitialFrame(root) {
-        const title = document.createElement("h3");
-        title.classList.add("title");
-        title.innerText = "BounceBall".toUpperCase();
-        this._initFrame.appendChild(title);
-        const belowSection = document.createElement("section");
-        belowSection.classList.add("belowSection");
-        const startButton = document.createElement("button");
-        startButton.classList.add("startButton");
-        startButton.innerText = "Start Button".toUpperCase();
-        startButton.addEventListener("click", () => {
-            this.firstGameStart();
-            this._initFrame.remove();
-        });
-        const text = document.createTextNode("Or Press Enter");
-        belowSection.appendChild(startButton);
-        belowSection.appendChild(text);
-        this._initFrame.appendChild(belowSection);
-        root.appendChild(this._thumbnailFrame);
+    attachElementToScreen(e) {
+        this._screenFrame.appendChild(e);
     }
     firstGameStart() {
         this._stage = 0;
         this.play();
         this.showElement(this._stageSpan);
         this._stageBackgroundRenderer && this._stageBackgroundRenderer();
-        this._initFrame.remove();
+        this._init.remove();
+    }
+    attachScreen(root) {
+        root.appendChild(this._screenFrame);
     }
     init(root) {
         this.attachCanvas(root);
-        this.renderInitialFrame(root);
-        const startGame = (e) => {
-            if (e.key === "Enter")
-                this.firstGameStart();
-            window.removeEventListener('keydown', startGame);
-        };
-        window.addEventListener('keydown', startGame);
+        this.attachScreen(root);
+        this.attachElementToScreen(this._init);
+        window.addEventListener('keydown', this._startByKey);
     }
     play() {
         stageBnd[this._stage](this.generateBlock.bind(this), this.initializeBall.bind(this));
