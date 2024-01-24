@@ -246,7 +246,7 @@ export class Game extends Controller {
     // }
 
     private firstGameStart() {
-        this._stage = 4;
+        this._stage = 0;
         this.play()
         this.showElement(this._stageSpan)
         this._stageBackgroundRenderer && this._stageBackgroundRenderer();

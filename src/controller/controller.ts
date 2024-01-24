@@ -20,14 +20,17 @@ type CrashInfo = {
     block: Block<BlockType>,
     dir: BallDirection
 }
-export interface BlockGenerator<T extends BlockType> {
-    x:number, 
-    y:number, 
-    w:number, 
-    h:number, 
-    type: BlockType, 
-    opt?: BlockAdditionalSetting<T>
-}
+
+type H_D = 'left'|'right'|'center'
+type V_D = 'up'|'down'|'center'
+// export interface BlockGenerator<T extends BlockType> {
+//     x:number, 
+//     y:number, 
+//     w:number, 
+//     h:number, 
+//     type: BlockType, 
+//     opt?: BlockAdditionalSetting<T>
+// }
 
 
 
@@ -118,7 +121,9 @@ export class Controller {
         
         if(grid) {
             const tempBlockArray = array.map(c=>c.block);
+            console.log(tempBlockArray.includes(grid), grid, dir)
             if(!tempBlockArray.includes(grid)) array.push({block: grid, dir })
+            
         }
     }
 
@@ -136,7 +141,7 @@ export class Controller {
     }
     
 
-    private ballCrashInfo(h_d: 'left'|'right'|'center', v_d: 'up'|'down'|'center'):CrashInfo[]|false {
+    private ballCrashInfo(h_d: H_D, v_d: V_D):CrashInfo[]|false {
 
         const crashArray: CrashInfo[] = [];
 
@@ -145,15 +150,22 @@ export class Controller {
 
         const xOf = a*this._ball.r / Math.sqrt(a**2 + 1)
 
+        const [m_left, m_right, m_up, m_down] = [
+            this._ball.x - this._ball.r,
+            this._ball.x + this._ball.r,
+            this._ball.y - this._ball.r,
+            this._ball.y + this._ball.r
+        ]
+
         switch(h_d) {
             case "right":
                 if(v_d === "up") {
-                    for(let x = Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH); 
+                    for(let x = Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH)+1; 
                     x <= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down")
-                        if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r
-                            && this.checkBallOverTheMargin(y, "up")) {
-                                // console.log('border', this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x])
+                        // y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r
+                        //     &&
+                        if( this.checkBallOverTheMargin(y, "up")) {
                                 this.checkAndConfirm(
                                     this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                     crashArray,
@@ -161,41 +173,65 @@ export class Controller {
                                 )
                             }
                     }
-                    for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH);
+                    this.checkAndConfirm(
+                        this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_right/BLOCK_WIDTH)],
+                        crashArray,
+                        "right"
+                    )
+                    for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH)+1;
                     x <= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r
-                            && this.checkBallOverTheMargin(y, "down")) {
+                        // y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r
+                        //     && 
+                        if(this.checkBallOverTheMargin(y, "down")) {
                                 this.checkAndConfirm(
                                     this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
                                     crashArray,
                                     "up"
                                 )
+                                
                                 // console.log('border', this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1])
                             }
                             
                     }
+                    this.checkAndConfirm(
+                    this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)]&&this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)] ,
+                    crashArray,
+                    "up"
+                    )
                 }
                 else if(v_d === "down") {
-                    for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH);
-                    x <= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x++) {
+                    const endPoint = this.checkBallOverTheMargin(this._ball.x + this._ball.r, "left") ?
+                    Math.floor((this._ball.x - xOf)/BLOCK_WIDTH) + 1 : Math.floor((this._ball.x - xOf)/BLOCK_WIDTH)
+                    for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH) + 1;
+                    x <= endPoint; x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down");
-                        if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r
-                            && this.checkBallOverTheMargin(y, "up")) {
-                                this.checkAndConfirm(
-                                    this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
-                                    crashArray,
-                                    "down"
-                                )
-                                // console.log('border', this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1])
-                            }
+                        // y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r
+                        //     &&
+                        // console.log("right down")
+                        if(this.checkBallOverTheMargin(y, "up")) {
+                            this.checkAndConfirm(
+                                this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
+                                crashArray,
+                                "down"
+                            )        
+                            // console.log('border', this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1])
+                        }
                             
                     }
-                    for(let x =  Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH);
-                    x <= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x++) {
+                    this.checkAndConfirm(
+                        this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)],
+                        crashArray,
+                        "down"
+                    )
+
+                    for(let x =  Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH)+1;
+                    x <= endPoint; x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r
-                            && this.checkBallOverTheMargin(y, "down")) {
+                        // y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r
+                        //     &&
+                        
+                        if( this.checkBallOverTheMargin(y, "down")) {
                                 this.checkAndConfirm(
                                     this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                     crashArray,
@@ -204,16 +240,22 @@ export class Controller {
                             }
                             
                     }
+                    this.checkAndConfirm(
+                        this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_right/BLOCK_WIDTH)],
+                        crashArray,
+                        "right"
+                    )
                 }
                 break;
             case "left":
                 if(v_d === "down") {
                     
                     for(let x = Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH); 
-                    x >= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x--) {
+                    x >= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH)+1; x--) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down");
-                        if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r
-                            && this.checkBallOverTheMargin(y, "up")) {
+                        // y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r
+                        //     &&
+                        if( this.checkBallOverTheMargin(y, "up")) {
                                 this.checkAndConfirm(
                                     this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                     crashArray,
@@ -221,11 +263,17 @@ export class Controller {
                                 // console.log('border', this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x])
                             }
                     }
+                    this.checkAndConfirm(
+                        this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)],
+                        crashArray,
+                        "down"
+                    )
                     for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH); 
-                    x >= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x--) {
+                    x >= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH)+1; x--) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y >= this._prevCoordinate.y - this._ball.r && y<=this._ball.y - this._ball.r
-                            && this.checkBallOverTheMargin(y, "down")) {
+                        // y >= this._prevCoordinate.y - this._ball.r && y<=this._ball.y - this._ball.r
+                        //     &&
+                        if( this.checkBallOverTheMargin(y, "down")) {
                                 this.checkAndConfirm(
                                     this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
                                     crashArray,
@@ -235,13 +283,19 @@ export class Controller {
                             }
                             
                     }
+                    this.checkAndConfirm(
+                    this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)]&& this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_left/BLOCK_WIDTH)],
+                    crashArray,
+                    "left"
+                    )
                 }
                 else if(v_d === "up") {
                     for(let x = Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH); 
-                    x >= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x--) {
+                    x >= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH)+1; x--) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r
-                            && this.checkBallOverTheMargin(y, "down")) {
+                        // y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r
+                        //     &&
+                        if( this.checkBallOverTheMargin(y, "down")) {
                                 this.checkAndConfirm(
                                     this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                     crashArray,
@@ -251,12 +305,18 @@ export class Controller {
                             }
                             
                     }
+                    this.checkAndConfirm(
+                        this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)]&&this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)] ,
+                        crashArray,
+                        "up"
+                    )
                     for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH); 
-                    x >= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x--) {
+                    x >= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH)+1; x--) {
 
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down");
-                        if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r
-                            && this.checkBallOverTheMargin(y, "up")){
+                        // y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r
+                        //     &&
+                        if( this.checkBallOverTheMargin(y, "up")){
                                 this.checkAndConfirm(
                                     this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
                                     crashArray,
@@ -265,9 +325,28 @@ export class Controller {
                                 // console.log('border', this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1])
                             } 
                     }
+                    this.checkAndConfirm(
+                    this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)]&& this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_left/BLOCK_WIDTH)],
+                    crashArray,
+                    "left"
+                    )
                 }
                 break;
-            default:
+            case "center":
+                if(v_d === "down") 
+                this.checkAndConfirm(
+                        this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)],
+                        crashArray,
+                        "down"
+                    )
+                else if(v_d === "up")
+                this.checkAndConfirm(
+                    this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)]&&this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)] ,
+                    crashArray,
+                    "up"
+                )
+                break;
+
         }
 
         
@@ -275,42 +354,46 @@ export class Controller {
 
         //general crash case from this on
 
-        const [m_left, m_right, m_up, m_down] = [
-            this._ball.x - this._ball.r,
-            this._ball.x + this._ball.r,
-            this._ball.y - this._ball.r,
-            this._ball.y + this._ball.r
-        ]
+        // const [m_left, m_right, m_up, m_down] = [
+        //     this._ball.x - this._ball.r,
+        //     this._ball.x + this._ball.r,
+        //     this._ball.y - this._ball.r,
+        //     this._ball.y + this._ball.r
+        // ]
 
         //down        
-        this.checkAndConfirm(
-            this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)],
-            crashArray,
-            "down"
-        )
+        // this.checkAndConfirm(
+        //     this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(m_down/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)],
+        //     crashArray,
+        //     "down"
+        // )
 
         //up
-        this.checkAndConfirm(
-            this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)]&&this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)] ,
-            crashArray,
-            "up"
-        )
+        // this.checkAndConfirm(
+        //     this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)]&&this._map.matrix[Math.floor(m_up/BLOCK_HEIGHT)][Math.floor(this._ball.x/BLOCK_WIDTH)] ,
+        //     crashArray,
+        //     "up"
+        // )
 
-        //left
-        this.checkAndConfirm(
-            this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)]&& this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_left/BLOCK_WIDTH)],
-            crashArray,
-            "left"
-        )
+        // //left
+        // this.checkAndConfirm(
+        //     this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)]&& this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_left/BLOCK_WIDTH)],
+        //     crashArray,
+        //     "left"
+        // )
 
-        //right
-        this.checkAndConfirm(
-            this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_right/BLOCK_WIDTH)],
-            crashArray,
-            "right"
-        )
+        // //right
+        // this.checkAndConfirm(
+        //     this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(this._ball.y/BLOCK_HEIGHT)][Math.floor(m_right/BLOCK_WIDTH)],
+        //     crashArray,
+        //     "right"
+        // )
 
-        if(crashArray.length !== 0) return crashArray
+        if(crashArray.length !== 0) {
+            this.flattenNearBlock(h_d, v_d, crashArray)
+            return crashArray
+        }
+        
         
         return false
     }
@@ -511,6 +594,39 @@ export class Controller {
                 if(info.dir === "down") this.gameDead();
                 break;
 
+        }
+    }
+
+    private flattenNearBlock(h_d: H_D, v_d: V_D, crashedArray: CrashInfo[]) {
+        crashedArray.sort((a,b)=>a.block.y - b.block.y)
+        let marker = 0;
+        let found = false;
+        crashedArray.forEach((_, index, array)=>{
+            if(index < array.length - 1 && array[index].block.y === array[index+1].block.y) {
+                marker = index;
+                found = true;
+            }
+        })
+        if(found) {
+            while(crashedArray.length !== marker+2) crashedArray.pop()
+            const latter = crashedArray.pop() as CrashInfo;
+            const former = crashedArray.pop() as CrashInfo;
+            
+            let selected
+
+            switch(h_d) {
+                case "right":
+                    selected = former.block.x < latter.block.x ? former : latter 
+                    crashedArray.push(selected);
+                    console.log(selected)
+                    break;
+                case "left":
+                    selected = former.block.x < latter.block.x ? latter : former
+                    crashedArray.push(selected)
+                    return 
+                case "center":
+
+            }
         }
     }
 

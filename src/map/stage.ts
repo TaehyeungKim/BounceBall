@@ -18,7 +18,7 @@ export const stageBnd: StageGenerator = {
         initializer({x: 50,y: 200})
         
         for(let i=0; i <= v_end; i++) {
-            generator(h_end, i,"End")
+            generator(h_end, i,"Normal")
         }
         for(let k = 0; k <= h_end; k++) {
             if(k < h_end-4 || k > h_end-2) generator(k, v_end,  'Normal')
