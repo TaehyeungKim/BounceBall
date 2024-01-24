@@ -7,9 +7,27 @@ export class Ball extends GameObject {
         this._gvs_end = Ball.MAX_GVS;
         this._hvs_end = Ball.MAX_HVS;
         this._r = w / 2;
+        this._flyStatus = false;
     }
     get r() {
         return this._r;
+    }
+    get flyStatus() {
+        return this._flyStatus;
+    }
+    set flyStatus(status) {
+        this._flyStatus = status;
+    }
+    fly(dir) {
+        this._gvs = 0;
+        if (dir === "FlyLeft") {
+            this._hvs = -Ball.MAX_HVS;
+            this.move("left");
+        }
+        else {
+            this._hvs = Ball.MAX_HVS;
+            this.move("right");
+        }
     }
     move(dir) {
         switch (dir) {

@@ -6,7 +6,7 @@ import { KeyboardObserver } from "./key.js";
 import { stageBnd } from "../map/stage.js";
 import { BounceAudio } from "../effect/sound.js";
 
-export type SpecialBallMove = "JumpTheWall"
+export type SpecialBallMove = "JumpTheWall"|"FlyRight"|"FlyLeft"|"Drift"
 
 type BallConstructor = {
     new(x:number, y:number, width:number, height: number): Ball;
@@ -33,6 +33,9 @@ export interface BlockGenerator<T extends BlockType> {
 
 export class Controller {
 
+
+    static _jumpableTimeGap: number = 150
+
     private _ball: Ball
     private _canvas: HTMLCanvasElement;
     
@@ -49,6 +52,7 @@ export class Controller {
     protected _stageBackgroundRenderer: (()=>void)|undefined
     protected _gameDeadMessageRenderer:(()=>void)|undefined
     protected _gameClearMessageRenderer:(()=>void)|undefined
+    private _keyPressedTimeStamp: {[k in Extract<BallDirection, "left"|"right">]: DOMHighResTimeStamp}
 
 
     constructor(ball: BallConstructor, map: MapConstructor) {
@@ -62,7 +66,7 @@ export class Controller {
         this._stage = 0;
 
         this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
-        
+        this._keyPressedTimeStamp = {"left": 0, "right": 0}
         
     }
 
@@ -87,12 +91,14 @@ export class Controller {
     renderAnimation() {
         
         const animStep = (time: DOMHighResTimeStamp) => {
+            
             if(this) {
                 this._canvas.getContext("2d")?.reset()
-                this._ball.bounce()
-                this.ball_h_acc();
+                this.ball_h_acc(time);
                 this.ball_h_move()
-                this.judgeBallCrash();
+                this._ball.bounce()
+                
+                this.judgeBallCrash(time);
                 if(this._stop || this._clear) {
                     window.cancelAnimationFrame(this._animID)
                     this.renderBall();
@@ -309,7 +315,7 @@ export class Controller {
         return false
     }
 
-    judgeBallCrash() {
+    judgeBallCrash(time: DOMHighResTimeStamp) {
         let h_d: 'left'|'right'|'center'; let v_d: 'up'|'down'|'center'
 
         if(this._ball.x > this._prevCoordinate.x) h_d = 'right';
@@ -331,10 +337,16 @@ export class Controller {
             let jumpOnTheWall = false;
             switch(c.dir) {
                 case "left":
-                    if(this._keyObserver.right) jumpOnTheWall = true;
+                    if(this._keyObserver.right) {
+                        
+                        if(time - this._keyPressedTimeStamp.left < Controller._jumpableTimeGap) jumpOnTheWall = true;
+                    }
                     break;
                 case "right":
-                    if(this._keyObserver.left) jumpOnTheWall = true;
+                    if(this._keyObserver.left) {
+                        
+                        if(time - this._keyPressedTimeStamp.right < Controller._jumpableTimeGap) jumpOnTheWall = true;
+                    }
                     break;
                     
             }
@@ -348,7 +360,14 @@ export class Controller {
             
             switch(crashed.dir) {
                 case "down":
-                    point.y = crashed.block.y - this._ball.r
+                    if(crashed.block.type === "FlyRight" || crashed.block.type ==="FlyLeft") {
+                        point.y = (2*crashed.block.y + crashed.block.height)/2
+                        point.x = crashed.block.type === "FlyRight" ? crashed.block.x + crashed.block.width + this._ball.r
+                        : crashed.block.x - this._ball.r
+                    
+                    }
+                    else point.y = crashed.block.y - this._ball.r
+                    
                 
                     // if(this._prevCoordinate.x !== this._ball.x) {
                     //     point.x = this.ballTrack(this._ball.x, point.y, true)    
@@ -375,10 +394,11 @@ export class Controller {
                     
                     break;
             }
-            this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
+            
             if(crashed.block.type === "WormholeStart") this.wormholeBlockTransfer(crashed);
             else this._ball.crash(crashed.dir, point)
             
+            this._prevCoordinate = {x: this._ball.x, y: this._ball.y}
             
             this.updateBlockPropertyByCrash(crashed)
 
@@ -426,12 +446,16 @@ export class Controller {
     }
 
     private updateBallPropertyByCrash(info: CrashInfo, jumpOnTheWall:boolean) {
+        
+        if(this._ball.flyStatus) this._ball.flyStatus = false;
+        
         switch(info.block.type) {
             default:
                 this.bounceAudioPlay(info.block.type)
                 this._ball.updateGvsEnd(Ball.MAX_GVS)
 
                 jumpOnTheWall && this.ballJumpTheWall(info.dir)
+                
                 break;
             case "End":
                 this.bounceAudioPlay(info.block.type)
@@ -453,6 +477,14 @@ export class Controller {
                 else this.bounceAudioPlay("Normal")
                 
                 jumpOnTheWall && this.ballJumpTheWall(info.dir)
+                break;
+            case "FlyRight":
+            case "FlyLeft":
+                
+                if(info.dir === "down") {
+                    this._ball.flyStatus = info.block.type
+                    this.bounceAudioPlay(info.block.type)
+                }
                 break;
     
             
@@ -499,9 +531,7 @@ export class Controller {
                     }
                     else {
                         context.fillStyle = e.renderSetting.outerColor as string
-                    }
-                    
-                    
+                    }    
                     context.fillRect(e.x, e.y, e.width, e.height);
 
                     context.fillStyle = e.renderSetting.innerColor as string;
@@ -515,6 +545,17 @@ export class Controller {
                     }
                     
                     context.fillRect(e.x + x_padding, e.y + y_padding, e.width - 2*x_padding, e.height - 2*y_padding)
+
+                    switch(e.type) {
+                        case "FlyRight":
+                        case "FlyLeft":
+                            const image = e.renderSetting.image as HTMLImageElement
+                            if(image) context.drawImage(image, e.x,e.y, e.width, e.height)
+                            break;
+                        default:        
+                    }
+
+                    
                 } 
             })
         })
@@ -524,15 +565,34 @@ export class Controller {
         this._map.pushBlock(x,y,type, opt)
     }
 
-    ball_h_acc() {
-        if(this._keyObserver.right) this._ball.move("right");
-        if(this._keyObserver.left) this._ball.move("left");
+    ball_h_acc(time: DOMHighResTimeStamp) {
+        if(this._keyObserver.right) {
+            this._keyPressedTimeStamp.right = time
+            
+            this._ball.move("right");
+        }
+        if(this._keyObserver.left) {
+            this._keyPressedTimeStamp.left = time
+            
+            this._ball.move("left");
+        }
         if(!this._keyObserver.right && !this._keyObserver.left) this._ball.h_stop();
     }
 
     ball_h_move() {
+        
+        if(this._ball.flyStatus) this._ball.fly(this._ball.flyStatus)
+        
         this._ball.h_move()
+        
+        if((this._keyObserver.left && this._ball.flyStatus === "FlyRight") 
+        || (this._keyObserver.right && this._ball.flyStatus === "FlyLeft")) {
+            this._ball.flyStatus = false;
+            this.bounceAudioPlay("Drift");    
+        }
+        
     }
+
 
     initializeBall(coord: Coordinate) {
         this._prevCoordinate.x = coord.x; this._prevCoordinate.y = coord.y

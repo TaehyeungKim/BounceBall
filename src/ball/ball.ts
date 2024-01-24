@@ -1,7 +1,9 @@
 import { GameObject } from "../baseObj.js";
+import { SpecialBallMove } from "../controller/controller.js";
 
 export type BallDirection = 'up'|'down'|'left'|'right'
 export type Coordinate = {x: number, y: number}
+
 
 export class Ball extends GameObject {
     private static _gs: number = 1.8;
@@ -10,6 +12,7 @@ export class Ball extends GameObject {
     private static _hvs_step: number = 0.05;
     private static _gvs_step: number = 0.05
     private _r: number
+    private _flyStatus: Extract<SpecialBallMove, "FlyLeft"|"FlyRight">|false
 
     static readonly MAX_GVS = 1.7;
     static readonly MAX_HVS = 1.7;
@@ -20,16 +23,40 @@ export class Ball extends GameObject {
     constructor(x:number,y:number,w:number,h:number) {
         super(x,y,w,h)
         this._r = w/2
+        this._flyStatus = false;
     }
 
     get r(){
         return this._r
     }
 
+    get flyStatus() {
+        return this._flyStatus
+    }
+
+    set flyStatus(status: Extract<SpecialBallMove, "FlyLeft"|"FlyRight">|false) {
+        this._flyStatus = status
+    }
+
+    fly(dir: Extract<SpecialBallMove, "FlyLeft"|"FlyRight">) {
+        
+        this._gvs = 0;
+        
+        if(dir === "FlyLeft") {
+            this._hvs = -Ball.MAX_HVS;
+            this.move("left");
+        } else {
+            this._hvs = Ball.MAX_HVS;
+            this.move("right");
+        }
+        
+        
+    }
+
     move(dir: BallDirection) {
         switch(dir) {
             case "down":
-            case "up": this.y += Ball._gs * this._gvs; this._gvs += Ball._gvs_step; break;
+            case "up": this.y += Ball._gs * this._gvs; this._gvs += Ball._gvs_step;break;
             case "left": 
                 // this.x += this._hvs; 
                 if(this._hvs > -this._hvs_end) this._hvs -= Ball._hvs_step;
@@ -82,6 +109,7 @@ export class Ball extends GameObject {
         switch(crashDir) {
             case "up":
                 this._gvs = -this._gvs;
+                
                 if(this._gvs > this._gvs_end) this._gvs = this._gvs_end;
                 
                 break;

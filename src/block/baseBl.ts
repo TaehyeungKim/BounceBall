@@ -1,14 +1,16 @@
 import { GameObject } from "../baseObj.js";
 import { BLOCK_HEIGHT, BLOCK_WIDTH } from "../constant.js";
+import { RightArrow, LeftArrow } from "../image/image.js";
 
-export type BlockType = 'Normal'|'Jump'|'Fragile'|'WormholeStart'|'WormholeEnd'|"End"|"Bomb"
+export type BlockType = 'Normal'|'Jump'|'Fragile'|'WormholeStart'|'WormholeEnd'|"End"|"Bomb"|"FlyRight"|"FlyLeft"
 export type ColorFuncByTimeStamp = (time: DOMHighResTimeStamp)=>string
 export type PaddingFuncByTimeStamp = (time: DOMHighResTimeStamp) => number
 
 type BlockRenderSetting = {
     innerColor: string|ColorFuncByTimeStamp
     outerColor: string|ColorFuncByTimeStamp,
-    paddingRatio: number|PaddingFuncByTimeStamp
+    paddingRatio: number|PaddingFuncByTimeStamp,
+    image?: HTMLImageElement
 }
 
 type BlockSettingSet = {
@@ -27,7 +29,7 @@ export type BlockAdditionalSetting<T extends BlockType> = T extends 'WormholeSta
 WormholeStartAdditionalSetting : T extends "WormholeEnd" ? 
 WormholeEndAdditionalSetting : never
 
- 
+  
 
 const BLOCK_SETTING:Readonly<BlockSettingSet> = Object.freeze({
     Normal: {
@@ -70,6 +72,18 @@ const BLOCK_SETTING:Readonly<BlockSettingSet> = Object.freeze({
         innerColor:"red",
         outerColor:"white",
         paddingRatio: 10
+    },
+    FlyRight: {
+        innerColor: "#FFF7F2",
+        outerColor: "#FF6D16",
+        paddingRatio: 10,
+        image: RightArrow
+    },
+    FlyLeft: {
+        innerColor: "#FFF7F2",
+        outerColor: "#FF6D16",
+        paddingRatio: 10,
+        image: LeftArrow
     }
 })
 

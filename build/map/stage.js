@@ -3,7 +3,7 @@ const h_end = CANVAS_WIDTH / BLOCK_WIDTH - 1;
 const v_end = CANVAS_HEIGHT / BLOCK_HEIGHT - 1;
 export const stageBnd = {
     0: (generator, initializer) => {
-        initializer({ x: 40, y: 200 });
+        initializer({ x: 50, y: 200 });
         for (let i = 0; i <= v_end; i++) {
             generator(h_end, i, "End");
         }
@@ -150,6 +150,38 @@ export const stageBnd = {
         }
     },
     4: (g, i) => {
+        i({ x: 80, y: 300 });
+        for (let i = 0; i <= h_end; i++)
+            g(i, 0, "Normal");
+        for (let k = 1; k <= v_end; k++) {
+            g(0, k, "Normal");
+            g(h_end, k, "Normal");
+            if (k > v_end - 17) {
+                g(5, k, "Normal");
+                g(6, k, "Normal");
+                g(7, k, "Normal");
+                if (k % 5 === 0) {
+                    for (let j = 8; j <= h_end - 4; j++)
+                        g(j, k, "Bomb");
+                    for (let j = h_end - 1; j >= 12; j--)
+                        g(j, k + 3, "Bomb");
+                    if (k + 4 <= v_end)
+                        g(9, k + 4, "FlyRight");
+                    g(h_end - 2, k + 2, "FlyLeft");
+                }
+            }
+            if (k > v_end - 5) {
+                g(1, k, "Fragile");
+                g(2, k, "Fragile");
+                g(3, k, "Fragile");
+                g(4, k, "Fragile");
+            }
+        }
+        g(11, 6, "FlyRight");
+        for (let j = 8; j < 12; j++)
+            g(j, v_end, "End");
+    },
+    5: (g, i) => {
         return true;
     }
 };

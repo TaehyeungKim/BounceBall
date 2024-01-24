@@ -1,5 +1,6 @@
 import { GameObject } from "../baseObj.js";
 import { BLOCK_HEIGHT, BLOCK_WIDTH } from "../constant.js";
+import { RightArrow, LeftArrow } from "../image/image.js";
 const BLOCK_SETTING = Object.freeze({
     Normal: {
         innerColor: 'black',
@@ -45,6 +46,18 @@ const BLOCK_SETTING = Object.freeze({
         innerColor: "red",
         outerColor: "white",
         paddingRatio: 10
+    },
+    FlyRight: {
+        innerColor: "#FFF7F2",
+        outerColor: "#FF6D16",
+        paddingRatio: 10,
+        image: RightArrow
+    },
+    FlyLeft: {
+        innerColor: "#FFF7F2",
+        outerColor: "#FF6D16",
+        paddingRatio: 10,
+        image: LeftArrow
     }
 });
 export class Block extends GameObject {
