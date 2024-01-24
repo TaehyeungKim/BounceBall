@@ -279,6 +279,18 @@ export class Controller {
         }
     }
 
+    private checkBallOverTheMargin(c: number, checking: BallDirection) {
+        switch(checking) {
+            case "up":
+                return !(Math.floor(c/BLOCK_HEIGHT) === Math.floor((c - 2*this._ball.r)/BLOCK_HEIGHT))
+            case "down":
+                return !(Math.floor(c/BLOCK_HEIGHT) === Math.floor((c+2*this._ball.r)/BLOCK_HEIGHT))
+            case "left":
+                return !(Math.floor(c/BLOCK_WIDTH) === Math.floor((c - 2*this._ball.r)/BLOCK_WIDTH))
+            case "right":
+                return !(Math.floor(c/BLOCK_WIDTH) === Math.floor((c+2*this._ball.r)/BLOCK_WIDTH))
+        }
+    }
     
 
     private ballCrashInfo(h_d: 'left'|'right'|'center', v_d: 'up'|'down'|'center'):CrashInfo[]|false {
@@ -296,7 +308,8 @@ export class Controller {
                     for(let x = Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH); 
                     x <= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down")
-                        if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r) 
+                        if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r
+                            && this.checkBallOverTheMargin(y, "up")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                 crashArray,
@@ -306,7 +319,8 @@ export class Controller {
                     for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH);
                     x <= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r) 
+                        if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r
+                            && this.checkBallOverTheMargin(y, "down")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
                                 crashArray,
@@ -318,7 +332,8 @@ export class Controller {
                     for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH);
                     x <= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down");
-                        if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r) 
+                        if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r
+                            && this.checkBallOverTheMargin(y, "up")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
                                 crashArray,
@@ -328,7 +343,8 @@ export class Controller {
                     for(let x =  Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH);
                     x <= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x++) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r) 
+                        if(y >= this._prevCoordinate.y - this._ball.r && y <= this._ball.y - this._ball.r
+                            && this.checkBallOverTheMargin(y, "down")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                 crashArray,
@@ -342,7 +358,8 @@ export class Controller {
                     for(let x = Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH); 
                     x >= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x--) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down");
-                        if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r) 
+                        if(y >= this._prevCoordinate.y + this._ball.r && y <= this._ball.y + this._ball.r
+                            && this.checkBallOverTheMargin(y, "up")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                 crashArray,
@@ -351,7 +368,8 @@ export class Controller {
                     for(let x = Math.floor((this._prevCoordinate.x - xOf)/BLOCK_WIDTH); 
                     x >= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x--) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y >= this._prevCoordinate.y - this._ball.r && y<=this._ball.y - this._ball.r) 
+                        if(y >= this._prevCoordinate.y - this._ball.r && y<=this._ball.y - this._ball.r
+                            && this.checkBallOverTheMargin(y, "down")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
                                 crashArray,
@@ -363,7 +381,8 @@ export class Controller {
                     for(let x = Math.floor((this._prevCoordinate.x + xOf)/BLOCK_WIDTH); 
                     x >= Math.floor((this._ball.x + xOf)/BLOCK_WIDTH); x--) {
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "up");
-                        if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r) 
+                        if(y <= this._prevCoordinate.y - this._ball.r && y >= this._ball.y - this._ball.r
+                            && this.checkBallOverTheMargin(y, "down")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x],
                                 crashArray,
@@ -374,7 +393,8 @@ export class Controller {
                     x >= Math.floor((this._ball.x - xOf)/BLOCK_WIDTH); x--) {
 
                         const y = this.marginBallTrack(x*BLOCK_WIDTH, 0, "down");
-                        if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r) 
+                        if(y <= this._prevCoordinate.y + this._ball.r && y >= this._ball.y + this._ball.r
+                            && this.checkBallOverTheMargin(y, "up")) 
                             this.checkAndConfirm(
                                 this._map.matrix[Math.floor(y/BLOCK_HEIGHT)] && this._map.matrix[Math.floor(y/BLOCK_HEIGHT)][x-1],
                                 crashArray,
