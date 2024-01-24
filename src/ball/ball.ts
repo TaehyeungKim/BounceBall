@@ -28,15 +28,17 @@ export class Ball extends GameObject {
 
     move(dir: BallDirection) {
         switch(dir) {
-            case "down": this.y += Ball._gs * this._gvs; this._gvs += Ball._gvs_step; break;
+            case "down":
             case "up": this.y += Ball._gs * this._gvs; this._gvs += Ball._gvs_step; break;
             case "left": 
                 // this.x += this._hvs; 
                 if(this._hvs > -this._hvs_end) this._hvs -= Ball._hvs_step;
+                
                 break;
             case "right":
                 // this.x += this._hvs;
                 if(this._hvs < this._hvs_end) this._hvs += Ball._hvs_step;
+                
                 break;
         }
     }
@@ -60,6 +62,20 @@ export class Ball extends GameObject {
     bounce() {
         if(this._gvs > 0) this.move('down');
         else this.move('up');
+    }
+
+    jumpOnTheWall(dir: BallDirection) {
+        switch(dir) {
+            case "left":
+                this._gvs = -Ball.MAX_GVS;
+                this._hvs = -Ball.MAX_HVS;
+                
+                break;
+            case "right":
+                this._gvs = -Ball.MAX_GVS;
+                this._hvs = Ball.MAX_HVS;
+                
+        }
     }
 
     crash(crashDir: BallDirection, point: Coordinate) {

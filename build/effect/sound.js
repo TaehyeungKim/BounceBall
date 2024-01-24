@@ -5,6 +5,7 @@ const Fragile = new Audio("../build/effect/sounds/fragile_bounce.mp3");
 const WormholeEnd = Normal;
 const WormholeStart = new Audio("../build/effect/sounds/wormhole_bounce.wav");
 const End = new Audio("../build/effect/sounds/end_bounce.mp3");
+const JumpTheWall = new Audio('../build/effect/sounds/jumpTheWall.mp3');
 export const BounceAudio = {
     "Normal": Normal,
     "Jump": Jump,
@@ -12,5 +13,6 @@ export const BounceAudio = {
     "Fragile": Fragile,
     "WormholeEnd": WormholeEnd,
     "End": End,
-    "WormholeStart": WormholeStart
+    "WormholeStart": WormholeStart,
+    "JumpTheWall": JumpTheWall
 };

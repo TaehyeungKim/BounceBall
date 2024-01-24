@@ -14,9 +14,6 @@ export class Ball extends GameObject {
     move(dir) {
         switch (dir) {
             case "down":
-                this.y += Ball._gs * this._gvs;
-                this._gvs += Ball._gvs_step;
-                break;
             case "up":
                 this.y += Ball._gs * this._gvs;
                 this._gvs += Ball._gvs_step;
@@ -54,6 +51,17 @@ export class Ball extends GameObject {
             this.move('down');
         else
             this.move('up');
+    }
+    jumpOnTheWall(dir) {
+        switch (dir) {
+            case "left":
+                this._gvs = -Ball.MAX_GVS;
+                this._hvs = -Ball.MAX_HVS;
+                break;
+            case "right":
+                this._gvs = -Ball.MAX_GVS;
+                this._hvs = Ball.MAX_HVS;
+        }
     }
     crash(crashDir, point) {
         switch (crashDir) {
