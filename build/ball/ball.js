@@ -43,6 +43,7 @@ export class Ball extends GameObject {
             case "right":
                 if (this._hvs < this._hvs_end)
                     this._hvs += Ball._hvs_step;
+                console.log(this._hvs);
                 break;
         }
     }

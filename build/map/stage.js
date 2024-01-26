@@ -3,9 +3,9 @@ const h_end = CANVAS_WIDTH / BLOCK_WIDTH - 1;
 const v_end = CANVAS_HEIGHT / BLOCK_HEIGHT - 1;
 export const stageBnd = {
     0: (generator, initializer) => {
-        initializer({ x: 50, y: 200 });
+        initializer({ x: 40, y: 200 });
         for (let i = 0; i <= v_end; i++) {
-            generator(h_end, i, "Normal");
+            generator(h_end, i, "End");
         }
         for (let k = 0; k <= h_end; k++) {
             if (k < h_end - 4 || k > h_end - 2)
@@ -150,7 +150,7 @@ export const stageBnd = {
         }
     },
     4: (g, i) => {
-        i({ x: 80, y: 300 });
+        i({ x: 80, y: 100 });
         for (let i = 0; i <= h_end; i++)
             g(i, 0, "Normal");
         for (let k = 1; k <= v_end; k++) {
@@ -170,7 +170,7 @@ export const stageBnd = {
                     g(h_end - 2, k + 2, "FlyLeft");
                 }
             }
-            if (k > v_end - 5) {
+            if (k > v_end - 10) {
                 g(1, k, "Fragile");
                 g(2, k, "Fragile");
                 g(3, k, "Fragile");
