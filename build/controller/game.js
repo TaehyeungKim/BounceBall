@@ -27,7 +27,7 @@ export class Game extends Controller {
                 <h3 class='deadMessage'>Game Over</h3><section class='belowSection'>
                 <button class='resumeButton'>Try Again?</button>Or Press Spacebar</section>
             </div>`, (e) => {
-            e.querySelector('.resumeButton').addEventListener("click", () => {
+            e.querySelector(".resumeButton").addEventListener("click", () => {
                 this._resumer(this._stage, e);
                 window.removeEventListener("keydown", this._tryAgainByKey);
             });
@@ -41,7 +41,7 @@ export class Game extends Controller {
                 </section>
             </div>
             `, (e) => {
-            e.querySelector('.resumeButton').addEventListener("click", () => {
+            e.querySelector(".resumeButton").addEventListener("click", () => {
                 this._clear = false;
                 this._resumer(0, e);
                 window.removeEventListener("keydown", this._resumeByKey);
@@ -53,32 +53,32 @@ export class Game extends Controller {
         this._tryAgainByKey = (e) => {
             if (e.key === " ") {
                 this._resumer(this._stage, this._deadMessage);
-                window.removeEventListener('keydown', this._tryAgainByKey);
+                window.removeEventListener("keydown", this._tryAgainByKey);
             }
         };
         this._resumeByKey = (e) => {
             if (e.key === " ") {
                 this._resumer(0, this._clearMessage);
                 this._clear = false;
-                window.removeEventListener('keydown', this._resumeByKey);
+                window.removeEventListener("keydown", this._resumeByKey);
             }
         };
         this._startByKey = (e) => {
             if (e.key === "Enter") {
                 this.firstGameStart();
-                window.removeEventListener('keydown', this._startByKey);
+                window.removeEventListener("keydown", this._startByKey);
                 this._init.remove();
             }
         };
         this._gameDeadMessageRenderer = () => {
             this.hideElement(this._stageSpan);
             this.showElement(this._deadMessage);
-            window.addEventListener('keydown', this._tryAgainByKey);
+            window.addEventListener("keydown", this._tryAgainByKey);
         };
         this._gameClearMessageRenderer = () => {
             this.hideElement(this._stageSpan);
             this.showElement(this._clearMessage);
-            window.addEventListener('keydown', this._resumeByKey);
+            window.addEventListener("keydown", this._resumeByKey);
         };
         this._resumer = (stage, message) => {
             this.hideElement(message);
@@ -93,7 +93,7 @@ export class Game extends Controller {
         e.remove();
     }
     renderScreenElement(htmlString, attachEventCallback) {
-        const template = document.createElement('template');
+        const template = document.createElement("template");
         template.innerHTML = htmlString;
         const element = template.content.firstElementChild;
         attachEventCallback && attachEventCallback(element);
@@ -103,7 +103,7 @@ export class Game extends Controller {
         this._screenFrame.appendChild(e);
     }
     firstGameStart() {
-        this._stage = 4;
+        this._stage = 0;
         this.play();
         this.showElement(this._stageSpan);
         this._stageBackgroundRenderer && this._stageBackgroundRenderer();
@@ -116,18 +116,18 @@ export class Game extends Controller {
         this.attachCanvas(root);
         this.attachScreen(root);
         this.attachElementToScreen(this._init);
-        window.addEventListener('keydown', this._startByKey);
+        window.addEventListener("keydown", this._startByKey);
     }
     play() {
         stageBnd[this._stage](this.generateBlock.bind(this), this.initializeBall.bind(this));
         this.renderAnimation();
-        window.addEventListener('keydown', (e) => {
+        window.addEventListener("keydown", (e) => {
             if (e.key === "ArrowLeft" || "ArrowRight" || "ArrowUp" || "ArorwDown") {
                 const key = e.key;
                 this._keyObserver.keyToggle(key, true);
             }
         });
-        window.addEventListener('keyup', (e) => {
+        window.addEventListener("keyup", (e) => {
             if (e.key === "ArrowLeft" || "ArrowRight" || "ArrowUp" || "ArorwDown") {
                 const key = e.key;
                 this._keyObserver.keyToggle(key, false);
